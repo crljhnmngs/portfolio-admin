@@ -203,6 +203,7 @@ const SignInForm = () => {
                                         size="sm"
                                         type="submit"
                                         disabled={isLoading}
+                                        data-testid="sign-in-button"
                                     >
                                         {isLoading ? (
                                             <div className="flex items-center">
