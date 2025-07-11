@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
 describe('ThemeContext', () => {
     it('should provide theme and toggleTheme to children', () => {

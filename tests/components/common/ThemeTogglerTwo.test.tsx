@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import * as ThemeContext from '@/context/ThemeContext';
+import * as ThemeContext from '@/contexts/ThemeContext';
 import { ThemeTogglerTwo } from '@/components/common/ThemeTogglerTwo';
 
 describe('ThemeTogglerTwo', () => {

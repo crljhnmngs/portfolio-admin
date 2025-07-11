@@ -1,16 +1,60 @@
 'use client';
 
+import React, { useState } from 'react';
 import Checkbox from '@/components/form/input/Checkbox';
 import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import Button from '@/components/ui/button/Button';
-import { EyeCloseIcon, EyeIcon } from '@/icons';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, LoginFormData } from '@/utils/validation/loginSchema';
+import { useLogin } from '@/hooks/useLogin';
+import { getLoginErrorMessage } from '@/utils/helpers';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const SignInForm = () => {
-    const [showPassword, setShowPassword] = useState(false);
+    const { userLogin, isLoading } = useLogin();
     const [isChecked, setIsChecked] = useState(false);
+    const router = useRouter();
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+    });
+
+    const onSubmit = (data: LoginFormData) => {
+        userLogin(data, {
+            onSuccess: (result) => {
+                if (result.error) {
+                    const message = getLoginErrorMessage(result.error);
+                    toast.error(message, {
+                        position: 'top-right',
+                    });
+                    return;
+                }
+
+                if (result.user && result.session) {
+                    toast.success('Login successful!', {
+                        position: 'top-right',
+                    });
+                    router.push('/dashboard');
+                }
+            },
+            onError: (error) => {
+                console.error('Login error:', error);
+                const message = getLoginErrorMessage(error);
+                toast.error(message, {
+                    position: 'top-right',
+                });
+            },
+        });
+    };
+
     return (
         <div className="flex flex-col flex-1 lg:w-1/2 w-full">
             <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
@@ -25,7 +69,14 @@ const SignInForm = () => {
                     </div>
                     <div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-                            <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+                            <button
+                                disabled={isLoading}
+                                className={`${
+                                    isLoading
+                                        ? 'cursor-not-allowed opacity-50'
+                                        : ''
+                                } inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10`}
+                            >
                                 <svg
                                     width="20"
                                     height="20"
@@ -52,18 +103,25 @@ const SignInForm = () => {
                                 </svg>
                                 Sign in with Google
                             </button>
-                            <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+                            <button
+                                disabled={isLoading}
+                                className={`${
+                                    isLoading
+                                        ? 'cursor-not-allowed opacity-50'
+                                        : ''
+                                } inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10`}
+                            >
                                 <svg
                                     width="21"
-                                    className="fill-current"
                                     height="20"
-                                    viewBox="0 0 21 20"
-                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
                                     xmlns="http://www.w3.org/2000/svg"
+                                    className="fill-current"
                                 >
-                                    <path d="M15.6705 1.875H18.4272L12.4047 8.75833L19.4897 18.125H13.9422L9.59717 12.4442L4.62554 18.125H1.86721L8.30887 10.7625L1.51221 1.875H7.20054L11.128 7.0675L15.6705 1.875ZM14.703 16.475H16.2305L6.37054 3.43833H4.73137L14.703 16.475Z" />
+                                    <path d="M12 0.297C5.373 0.297 0 5.67 0 12.297c0 5.289 3.438 9.773 8.205 11.387.6.111.82-.261.82-.58 0-.287-.011-1.244-.017-2.255-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.418-1.305.762-1.605-2.665-.304-5.467-1.332-5.467-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.536-1.524.117-3.176 0 0 1.008-.322 3.3 1.23a11.52 11.52 0 0 1 3.003-.404c1.018.005 2.043.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.655 1.652.243 2.873.12 3.176.77.84 1.235 1.911 1.235 3.221 0 4.61-2.807 5.624-5.479 5.921.43.371.823 1.102.823 2.222 0 1.604-.015 2.896-.015 3.293 0 .321.216.694.825.576C20.565 22.065 24 17.583 24 12.297 24 5.67 18.627.297 12 .297z" />
                                 </svg>
-                                Sign in with X
+                                Sign in with GitHub
                             </button>
                         </div>
                         <div className="relative py-3 sm:py-5">
@@ -76,7 +134,7 @@ const SignInForm = () => {
                                 </span>
                             </div>
                         </div>
-                        <form>
+                        <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="space-y-6">
                                 <div>
                                     <Label>
@@ -88,6 +146,15 @@ const SignInForm = () => {
                                     <Input
                                         placeholder="info@gmail.com"
                                         type="email"
+                                        register={register('email', {
+                                            required: true,
+                                        })}
+                                        error={!!errors.email}
+                                        hint={
+                                            errors.email
+                                                ? errors.email.message
+                                                : ''
+                                        }
                                     />
                                 </div>
                                 <div>
@@ -99,25 +166,18 @@ const SignInForm = () => {
                                     </Label>
                                     <div className="relative">
                                         <Input
-                                            type={
-                                                showPassword
-                                                    ? 'text'
-                                                    : 'password'
-                                            }
+                                            type="password"
                                             placeholder="Enter your password"
-                                        />
-                                        <span
-                                            onClick={() =>
-                                                setShowPassword(!showPassword)
+                                            register={register('password', {
+                                                required: true,
+                                            })}
+                                            error={!!errors.password}
+                                            hint={
+                                                errors.password
+                                                    ? errors.password.message
+                                                    : ''
                                             }
-                                            className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
-                                        >
-                                            {showPassword ? (
-                                                <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
-                                            ) : (
-                                                <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
-                                            )}
-                                        </span>
+                                        />
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -138,8 +198,38 @@ const SignInForm = () => {
                                     </Link>
                                 </div>
                                 <div>
-                                    <Button className="w-full" size="sm">
-                                        Sign in
+                                    <Button
+                                        className="w-full"
+                                        size="sm"
+                                        type="submit"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <div className="flex items-center">
+                                                <svg
+                                                    className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                    ></circle>
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                                Signing in...
+                                            </div>
+                                        ) : (
+                                            'Sign in'
+                                        )}
                                     </Button>
                                 </div>
                             </div>

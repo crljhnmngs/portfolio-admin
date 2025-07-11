@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import React from 'react';
 
 export const ThemeTogglerTwo = () => {

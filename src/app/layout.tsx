@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Outfit } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { ReactNode } from 'react';
+import Providers from './Providers';
 
 const outfit = Outfit({
     subsets: ['latin'],
@@ -16,7 +15,7 @@ const RootLayout = ({
     return (
         <html lang="en">
             <body className={`${outfit.className} dark:bg-gray-900`}>
-                <ThemeProvider>{children}</ThemeProvider>
+                <Providers>{children}</Providers>
             </body>
         </html>
     );

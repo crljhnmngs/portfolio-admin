@@ -1,7 +1,6 @@
-import React from 'react';
-import { ReactNode } from 'react';
+import React, { ReactNode, ButtonHTMLAttributes } from 'react';
 
-interface ButtonProps {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     children: ReactNode;
     size?: 'sm' | 'md';
     variant?: 'primary' | 'outline';
@@ -21,6 +20,7 @@ const Button = ({
     onClick,
     className = '',
     disabled = false,
+    ...props
 }: ButtonProps) => {
     // Size Classes
     const sizeClasses = {
@@ -45,6 +45,7 @@ const Button = ({
             }`}
             onClick={onClick}
             disabled={disabled}
+            {...props}
         >
             {startIcon && (
                 <span className="flex items-center">{startIcon}</span>

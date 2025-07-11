@@ -1,6 +1,5 @@
-import React from 'react';
-import { ReactNode } from 'react';
-import { twMerge } from 'tailwind-merge';
+import React, { ReactNode } from 'react';
+import { cn } from '@/utils/cn';
 
 interface LabelProps {
     htmlFor?: string;
@@ -12,7 +11,7 @@ const Label = ({ htmlFor, children, className }: LabelProps) => {
     return (
         <label
             htmlFor={htmlFor}
-            className={twMerge(
+            className={cn(
                 'mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400',
 
                 className

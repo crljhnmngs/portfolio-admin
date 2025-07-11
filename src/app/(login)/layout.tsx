@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import GridShape from '@/components/common/GridShape';
 import { ThemeTogglerTwo } from '@/components/common/ThemeTogglerTwo';
-import { ThemeProvider } from '@/context/ThemeContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import Link from 'next/link';
-import { ReactNode } from 'react';
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
     return (
