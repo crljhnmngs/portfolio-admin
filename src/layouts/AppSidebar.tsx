@@ -3,7 +3,12 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '../contexts/SidebarContext';
-import { ChevronDownIcon, GridIcon, HorizontaLDots } from '../icons/index';
+import {
+    ChevronDownIcon,
+    GridIcon,
+    HorizontaLDots,
+    UserCircleIcon,
+} from '../icons/index';
 
 type NavItem = {
     name: string;
@@ -17,6 +22,11 @@ const navItems: NavItem[] = [
         icon: <GridIcon />,
         name: 'Dashboard',
         path: '/dashboard',
+    },
+    {
+        icon: <UserCircleIcon />,
+        name: 'General Info',
+        path: '/general-info',
     },
 ];
 
