@@ -7,7 +7,7 @@ import { useUser } from '@/contexts/UserContext';
 export const UserDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { user, signOut } = useUser();
-    console.log(user);
+
     function toggleDropdown(
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) {
