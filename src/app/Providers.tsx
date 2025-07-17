@@ -14,7 +14,14 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
         <QueryClientProvider client={queryClient}>
             <UserProvider>
                 <ThemeProvider>
-                    <Toaster />
+                    <Toaster
+                        position="top-right"
+                        toastOptions={{
+                            style: {
+                                zIndex: 9999,
+                            },
+                        }}
+                    />
                     {children}
                 </ThemeProvider>
                 {process.env.NODE_ENV === 'development' && (
