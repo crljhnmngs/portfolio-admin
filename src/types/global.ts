@@ -18,3 +18,11 @@ export type GeneralInfoResponse = {
     scheduleLink: string;
     socialLinks: Record<string, string>;
 };
+
+export type SupportedLanguage = {
+    code: string;
+    name: string;
+    is_default?: boolean;
+};
+
+export type SupportedLanguagesResponse = SupportedLanguage[];
