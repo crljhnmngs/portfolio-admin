@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 import { UserProvider } from '@/contexts/UserContext';
+import { GeneralInfoProvider } from '@/contexts/GeneralInfoContext';
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
     const [queryClient] = useState(() => new QueryClient());
@@ -22,7 +23,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
                             },
                         }}
                     />
-                    {children}
+                    <GeneralInfoProvider>{children}</GeneralInfoProvider>
                 </ThemeProvider>
                 {process.env.NODE_ENV === 'development' && (
                     <ReactQueryDevtools initialIsOpen={false} />

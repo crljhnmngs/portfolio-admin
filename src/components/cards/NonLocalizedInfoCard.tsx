@@ -2,13 +2,13 @@
 import React, { useEffect } from 'react';
 import { useModal } from '@/hooks/useModal';
 import { NonLocalizedInfoModal } from '../modals/NonLocalizedInfoModal';
-import { useGeneralInfo } from '@/hooks/useGeneralInfo';
 import { ComponentLoader } from '../loaders/ComponentLoader';
 import toast from 'react-hot-toast';
+import { useGeneralInfoContext } from '@/contexts/GeneralInfoContext';
 
 export const NonLocalizedInfoCard = () => {
     const { isOpen, openModal, closeModal } = useModal();
-    const { generalInfo, isLoading, error, isError } = useGeneralInfo();
+    const { generalInfo, isLoading, error, isError } = useGeneralInfoContext();
 
     useEffect(() => {
         if (error) {

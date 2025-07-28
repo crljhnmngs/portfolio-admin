@@ -1,3 +1,5 @@
+import { LocalizedInfoFormData } from '@/utils/validation/localizedInfoSchema';
+
 export type SocialProfile = {
     platform: string;
     url: string;
@@ -26,3 +28,19 @@ export type SupportedLanguage = {
 };
 
 export type SupportedLanguagesResponse = SupportedLanguage[];
+
+export type LocalizedInfoResponse = {
+    id: string;
+    general_info_id: string;
+    full_name: string;
+    current_company: string;
+    current_role: string;
+    about_me: string;
+    address: string;
+};
+
+export type UpsertLocalizedInfoParams = {
+    generalInfoId: string;
+    languageCode: string;
+    data: LocalizedInfoFormData;
+};

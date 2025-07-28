@@ -1,32 +1,94 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
+import {
+    localizedInfoSchema,
+    LocalizedInfoFormData,
+} from '@/utils/validation/localizedInfoSchema';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
+import RichTextEditor from '../editor/RichTextEditor';
+import { useUpsertLocalizedInfo } from '@/hooks/useUpsertLocalizedInfo';
+import { LocalizedInfoResponse } from '@/types/global';
+import { useGeneralInfoContext } from '@/contexts/GeneralInfoContext';
 
-type LocalizedInfoModal = {
+type LocalizedInfoModalProps = {
     isOpen: boolean;
     closeModal: () => void;
     selectedLang: string;
+    initialData: LocalizedInfoResponse | null;
+    isLoading?: boolean;
 };
 
 export const LocalizedInfoModal = ({
     isOpen,
     closeModal,
     selectedLang,
-}: LocalizedInfoModal) => {
-    const handleSave = () => {
-        console.info('Saving..');
+    initialData,
+    isLoading = false,
+}: LocalizedInfoModalProps) => {
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        reset,
+        formState: { errors, isDirty },
+    } = useForm<LocalizedInfoFormData>({
+        resolver: zodResolver(localizedInfoSchema),
+        defaultValues: {
+            name: '',
+            address: '',
+            current_company: '',
+            current_role: '',
+            about: '',
+        },
+    });
+
+    useEffect(() => {
+        if (initialData) {
+            reset({
+                name: initialData.full_name ?? '',
+                address: initialData.address ?? '',
+                current_company: initialData.current_company ?? '',
+                current_role: initialData.current_role ?? '',
+                about: initialData.about_me ?? '',
+            });
+        }
+    }, [initialData, reset]);
+
+    const { upsertLocalizedInfo, isLoading: isSaving } =
+        useUpsertLocalizedInfo();
+
+    const { generalInfo } = useGeneralInfoContext();
+
+    const onSubmit = async (data: LocalizedInfoFormData) => {
+        const generalInfoId = initialData?.general_info_id || generalInfo?.id;
+        if (!generalInfoId) return;
+        await upsertLocalizedInfo({
+            generalInfoId,
+            languageCode: selectedLang,
+            data,
+        });
+        handleClose();
+    };
+
+    const handleClose = () => {
+        reset();
         closeModal();
     };
+
+    const aboutValue = watch('about');
 
     return (
         <Modal
             isOpen={isOpen}
-            onClose={closeModal}
+            onClose={handleClose}
             className="max-w-[700px] m-4"
         >
             <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
@@ -40,7 +102,10 @@ export const LocalizedInfoModal = ({
                     </p>
                 </div>
 
-                <form className="flex flex-col">
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="flex flex-col"
+                >
                     <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
                         <div>
                             <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
@@ -50,14 +115,23 @@ export const LocalizedInfoModal = ({
                             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                                 <div className="col-span-2 lg:col-span-1">
                                     <Label>Name</Label>
-                                    <Input type="text" defaultValue="Carl" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Your name"
+                                        register={register('name')}
+                                        error={!!errors.name}
+                                        hint={errors.name?.message || ''}
+                                    />
                                 </div>
 
                                 <div className="col-span-2 lg:col-span-1">
                                     <Label>Address</Label>
                                     <Input
                                         type="text"
-                                        defaultValue="Cebu, PH"
+                                        placeholder="Your address"
+                                        register={register('address')}
+                                        error={!!errors.address}
+                                        hint={errors.address?.message || ''}
                                     />
                                 </div>
 
@@ -65,7 +139,13 @@ export const LocalizedInfoModal = ({
                                     <Label>Current Company</Label>
                                     <Input
                                         type="text"
-                                        defaultValue="Alliance Software"
+                                        placeholder="Your current company"
+                                        register={register('current_company')}
+                                        error={!!errors.current_company}
+                                        hint={
+                                            errors.current_company?.message ||
+                                            ''
+                                        }
                                     />
                                 </div>
 
@@ -73,15 +153,24 @@ export const LocalizedInfoModal = ({
                                     <Label>Current Role</Label>
                                     <Input
                                         type="text"
-                                        defaultValue="Software Engineer"
+                                        placeholder="Your current role"
+                                        register={register('current_role')}
+                                        error={!!errors.current_role}
+                                        hint={
+                                            errors.current_role?.message || ''
+                                        }
                                     />
                                 </div>
 
                                 <div className="col-span-2">
                                     <Label>About</Label>
-                                    <textarea
-                                        className="w-full min-h-[150px] rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
-                                        defaultValue={`Hello there! I'm Carl, a 25-year-old Front-End / Full-Stack Web Developer based in Cebu, Philippines, with 2.8 years of professional experience. My journey with computers started early in life, sparking a passion that has only grown stronger over the years. I am highly committed to continuous learning and driven by a passion for mastering new technologies and solving complex challenges. With a strong foundation in clean architecture for both frontend and backend web development, I excel at designing and delivering scalable, maintainable solutions. Known for adaptability, quick learning, and a collaborative mindset, I thrive in dynamic tech environments, lead teams effectively, and consistently ensure high-quality software delivery. Beyond coding, I find joy in online gaming and indulge in the world of anime and TV series during my downtime.`}
+                                    <RichTextEditor
+                                        value={aboutValue}
+                                        onChange={(val: string) =>
+                                            setValue('about', val, {
+                                                shouldDirty: true,
+                                            })
+                                        }
                                     />
                                 </div>
                             </div>
@@ -92,12 +181,18 @@ export const LocalizedInfoModal = ({
                         <Button
                             size="sm"
                             variant="outline"
-                            onClick={closeModal}
+                            onClick={handleClose}
                         >
                             Close
                         </Button>
-                        <Button size="sm" onClick={handleSave}>
-                            Save Changes
+                        <Button
+                            size="sm"
+                            type="submit"
+                            disabled={!isDirty || isLoading || isSaving}
+                        >
+                            {isLoading || isSaving
+                                ? 'Saving...'
+                                : 'Save Changes'}
                         </Button>
                     </div>
                 </form>
