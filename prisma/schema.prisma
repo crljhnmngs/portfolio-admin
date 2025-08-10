@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model general_info {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  resume_url           String?
+  schedule_link        String?
+  email                String?
+  created_at           DateTime?              @default(now()) @db.Timestamp(6)
+  general_translations general_translations[]
+  social_profiles      social_profiles[]
+  translated_roles     translated_roles[]
+}
+
+model general_translations {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  general_info_id     String?              @db.Uuid
+  language_code       String?
+  full_name           String
+  current_company     String?
+  current_role        String?
+  about_me            String?
+  address             String?
+  general_info        general_info?        @relation(fields: [general_info_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  supported_languages supported_languages? @relation(fields: [language_code], references: [code], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([general_info_id, language_code], map: "unique_general_info_language")
+}
+
+model social_profiles {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  general_info_id String?       @db.Uuid
+  platform        String
+  url             String
+  display_name    String?
+  general_info    general_info? @relation(fields: [general_info_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model supported_languages {
+  code                 String                 @id
+  name                 String
+  is_default           Boolean?               @default(false)
+  general_translations general_translations[]
+  translated_roles     translated_roles[]
+}
+
+model translated_roles {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  general_info_id     String?              @db.Uuid
+  language_code       String?
+  role_name           String
+  general_info        general_info?        @relation(fields: [general_info_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  supported_languages supported_languages? @relation(fields: [language_code], references: [code], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  hashedPassword String
+  firstName      String
+  lastName       String
+  createdAt      DateTime @default(now())
+
+  sessions       Session[]
+  keys           Key[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Key {
+  id             String   @id
+  userId         String
+  hashedPassword String?
+  primary        Boolean  @default(false)
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

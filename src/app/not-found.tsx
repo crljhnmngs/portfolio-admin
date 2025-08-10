@@ -30,6 +30,7 @@ const NotFound = () => {
                     className="dark:hidden"
                     width={472}
                     height={152}
+                    priority
                 />
                 <Image
                     src="/images/error/404-dark.svg"
@@ -37,6 +38,7 @@ const NotFound = () => {
                     className="hidden dark:block"
                     width={472}
                     height={152}
+                    priority
                 />
 
                 <p className="mt-10 mb-6 text-base text-gray-700 dark:text-gray-400 sm:text-lg">

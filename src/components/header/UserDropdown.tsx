@@ -3,10 +3,11 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { useUser } from '@/contexts/UserContext';
+import { ComponentLoader } from '../loaders/ComponentLoader';
 
 export const UserDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { user, signOut } = useUser();
+    const { user, signOut, isUserLoading } = useUser();
 
     function toggleDropdown(
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -53,16 +54,20 @@ export const UserDropdown = () => {
                 onClose={closeDropdown}
                 className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
             >
-                <div>
-                    <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-                        {user?.identities?.[0]?.identity_data?.firstName}{' '}
-                        {user?.identities?.[0]?.identity_data?.lastName}{' '}
-                        {'(Admin)'}
-                    </span>
-                    <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-                        {user?.email}
-                    </span>
-                </div>
+                {isUserLoading ? (
+                    <div className="w-full flex justify-center">
+                        <ComponentLoader size={30} />
+                    </div>
+                ) : (
+                    <div>
+                        <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+                            {user?.firstName} {user?.lastName} {' (Admin)'}
+                        </span>
+                        <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
+                            {user?.email}
+                        </span>
+                    </div>
+                )}
 
                 <Link
                     href="/"

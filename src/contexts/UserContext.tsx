@@ -1,32 +1,38 @@
 'use client';
 
-import React, {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-    ReactNode,
-} from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import createClient from '@/utils/supabase/client';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { logOut } from '@/utils/supabase/actions/auth';
+import axios from 'axios';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+
+interface LuciaUser {
+    id: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+}
+
+interface LuciaSession {
+    id: string;
+    expiresAt: string;
+}
 
 interface UserContextType {
-    user: User | null;
-    session: Session | null;
-    loading: boolean;
+    user: LuciaUser | null;
+    session: LuciaSession | null;
+    isUserLoading: boolean;
+    isSignOutLoading: boolean;
     signOut: () => Promise<void>;
-    refreshUser: () => Promise<void>;
+    refreshUser: () => void;
+    isLoggedOut: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const useUser = () => {
     const context = useContext(UserContext);
-    if (context === undefined) {
-        throw new Error('useUser must be used within a UserProvider');
-    }
+    if (!context) throw new Error('useUser must be used within a UserProvider');
     return context;
 };
 
@@ -34,78 +40,74 @@ interface UserProviderProps {
     children: ReactNode;
 }
 
-export const UserProvider = ({ children }: UserProviderProps) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [session, setSession] = useState<Session | null>(null);
-    const [loading, setLoading] = useState(true);
-    const router = useRouter();
-    const supabase = createClient();
+const axiosInstance = axios.create({
+    withCredentials: true,
+});
 
-    const refreshUser = async () => {
-        try {
-            const {
-                data: { user: currentUser },
-                error,
-            } = await supabase.auth.getUser();
-            if (error) {
-                console.error('Error fetching user:', error);
-                setUser(null);
-                setSession(null);
-            } else {
-                setUser(currentUser);
+const fetchSession = async () => {
+    const res = await axiosInstance.get('/api/auth/session');
+    return res.data;
+};
+
+const handleApiError = (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || error.message, {
+            position: 'top-right',
+        });
+    } else {
+        toast.error('An unexpected error occurred.', {
+            position: 'top-right',
+        });
+    }
+};
+
+export const UserProvider = ({ children }: UserProviderProps) => {
+    const router = useRouter();
+    const queryClient = useQueryClient();
+
+    const { data, isLoading, refetch } = useQuery({
+        queryKey: ['auth', 'session'],
+        queryFn: async () => {
+            try {
+                return await fetchSession();
+            } catch (err) {
+                handleApiError(err);
             }
-        } catch (error) {
-            console.error('Error refreshing user:', error);
-            setUser(null);
-            setSession(null);
-        }
-    };
+        },
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
+
+    const isLoggedOut = !isLoading && (!data?.user || !data?.session);
+
+    const [signOutLoading, setSignOutLoading] = useState(false);
 
     const signOut = async () => {
+        setSignOutLoading(true);
         try {
-            await logOut();
-            setUser(null);
-            setSession(null);
-            router.push('/');
+            await axiosInstance.post('/api/auth/logout');
+            queryClient.removeQueries({ queryKey: ['auth', 'session'] });
+            router.refresh();
         } catch (error) {
-            console.error('Error signing out:', error);
+            handleApiError(error);
+        } finally {
+            setSignOutLoading(false);
         }
-    };
-
-    useEffect(() => {
-        // Get initial session
-        const getInitialSession = async () => {
-            const {
-                data: { session: initialSession },
-            } = await supabase.auth.getSession();
-            setSession(initialSession);
-            setUser(initialSession?.user ?? null);
-            setLoading(false);
-        };
-
-        getInitialSession();
-
-        // Listen for auth changes
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
-    }, [supabase.auth]);
-
-    const value = {
-        user,
-        session,
-        loading,
-        signOut,
-        refreshUser,
     };
 
     return (
-        <UserContext.Provider value={value}>{children}</UserContext.Provider>
+        <UserContext.Provider
+            value={{
+                user: data?.user || null,
+                session: data?.session || null,
+                isUserLoading: isLoading,
+                isSignOutLoading: signOutLoading,
+                signOut,
+                refreshUser: refetch,
+                isLoggedOut,
+            }}
+        >
+            {children}
+        </UserContext.Provider>
     );
 };

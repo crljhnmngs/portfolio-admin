@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getSupportedLanguages } from '@/utils/supabase/queries/getSupportedLanguages';
+import axios from 'axios';
 import { SupportedLanguagesResponse } from '@/types/global';
 
 export const useSupportedLanguages = () => {
@@ -10,7 +10,11 @@ export const useSupportedLanguages = () => {
         ...rest
     } = useQuery<SupportedLanguagesResponse, Error>({
         queryKey: ['supported-languages'],
-        queryFn: getSupportedLanguages,
+        queryFn: async () => {
+            const response = await axios.get('/api/supported-languages');
+            return response.data
+                .supportedLanguages as SupportedLanguagesResponse;
+        },
         staleTime: 10 * 60 * 1000, // 10 minutes
     });
 

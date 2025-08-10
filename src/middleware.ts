@@ -5,24 +5,18 @@ const protectedRoutes = ['/dashboard', '/general-info'];
 const authRoutes = ['/'];
 
 export const middleware = (request: NextRequest) => {
+    const sessionCookie = request.cookies.get('auth_session')?.value;
+
     const { pathname } = request.nextUrl;
 
-    const token = request.cookies.get(
-        'sb-fcxvldxxwkxkxfmlstcs-auth-token'
-    )?.value;
-
     if (protectedRoutes.some((route) => pathname.startsWith(route))) {
-        if (!token) {
-            const loginUrl = new URL('/', request.url);
-            return NextResponse.redirect(loginUrl);
+        if (!sessionCookie) {
+            return NextResponse.redirect(new URL('/', request.url));
         }
     }
 
-    if (authRoutes.some((route) => pathname === route)) {
-        if (token) {
-            const dashboardUrl = new URL('/dashboard', request.url);
-            return NextResponse.redirect(dashboardUrl);
-        }
+    if (authRoutes.includes(pathname) && sessionCookie) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
     return NextResponse.next();

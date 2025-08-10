@@ -10,14 +10,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormData } from '@/utils/validation/loginSchema';
 import { useLogin } from '@/hooks/useLogin';
-import { getLoginErrorMessage } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 
 const SignInForm = () => {
     const { userLogin, isLoading } = useLogin();
     const [isChecked, setIsChecked] = useState(false);
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const {
         register,
@@ -29,28 +31,43 @@ const SignInForm = () => {
 
     const onSubmit = (data: LoginFormData) => {
         userLogin(data, {
-            onSuccess: (result) => {
+            onSuccess: async (result) => {
                 if (result.error) {
-                    const message = getLoginErrorMessage(result.error);
-                    toast.error(message, {
-                        position: 'top-right',
-                    });
-                    return;
+                    if (isAxiosError(result.error)) {
+                        toast.error(
+                            result.error.response?.data.error ||
+                                result.error.message,
+                            {
+                                position: 'top-right',
+                            }
+                        );
+                    } else {
+                        toast.error('An unexpected error occurred.', {
+                            position: 'top-right',
+                        });
+                    }
                 }
 
-                if (result.user && result.session) {
+                if (result.user) {
                     toast.success('Login successful!', {
                         position: 'top-right',
+                    });
+                    await queryClient.refetchQueries({
+                        queryKey: ['auth', 'session'],
                     });
                     router.push('/dashboard');
                 }
             },
             onError: (error) => {
-                console.error('Login error:', error);
-                const message = getLoginErrorMessage(error);
-                toast.error(message, {
-                    position: 'top-right',
-                });
+                if (isAxiosError(error)) {
+                    toast.error(error.response?.data.error || error.message, {
+                        position: 'top-right',
+                    });
+                } else {
+                    toast.error('An unexpected error occurred.', {
+                        position: 'top-right',
+                    });
+                }
             },
         });
     };

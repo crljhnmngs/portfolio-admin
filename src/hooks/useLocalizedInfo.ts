@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getLocalizedInfo } from '@/utils/supabase/queries/getlocalizedInfo';
+import axios from 'axios';
 import { LocalizedInfoResponse } from '@/types/global';
 
 export const useLocalizedInfo = (
@@ -13,7 +13,12 @@ export const useLocalizedInfo = (
         ...rest
     } = useQuery<LocalizedInfoResponse | null, Error>({
         queryKey: ['localized-info', generalInfoId, languageCode],
-        queryFn: () => getLocalizedInfo({ generalInfoId, languageCode }),
+        queryFn: async () => {
+            const response = await axios.get('/api/localized-info', {
+                params: { generalInfoId, languageCode },
+            });
+            return response.data.localizedInfo as LocalizedInfoResponse | null;
+        },
         enabled: !!generalInfoId && !!languageCode,
         staleTime: 10 * 60 * 1000, // 10 minutes
     });

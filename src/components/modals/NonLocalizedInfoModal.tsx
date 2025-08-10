@@ -12,7 +12,7 @@ import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import { GeneralInfoResponse } from '@/types/global';
-import { useUpdateGeneralInfo } from '@/hooks/useUpdateGeneralInfo';
+import { useUpsertGeneralInfo } from '@/hooks/useUpsertGeneralInfo';
 
 type NonLocalizedInfoModalProps = {
     isOpen: boolean;
@@ -25,7 +25,7 @@ export const NonLocalizedInfoModal = ({
     closeModal,
     initialData,
 }: NonLocalizedInfoModalProps) => {
-    const { updateGeneralInfo, isLoading } = useUpdateGeneralInfo();
+    const { upsertGeneralInfo, isLoading } = useUpsertGeneralInfo();
     const {
         register,
         handleSubmit,
@@ -64,7 +64,7 @@ export const NonLocalizedInfoModal = ({
         if (!initialData?.id) return;
 
         try {
-            await updateGeneralInfo({ data, id: initialData.id });
+            await upsertGeneralInfo({ data, id: initialData.id });
             closeModal();
         } catch {}
     };

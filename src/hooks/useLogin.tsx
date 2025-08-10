@@ -1,12 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { LoginFormData } from '@/utils/validation/loginSchema';
-import { login } from '@/utils/supabase/actions/auth';
+import axios from 'axios';
 
 export function useLogin() {
     const mutation = useMutation({
         mutationFn: async (data: LoginFormData) => {
-            const result = await login(data);
-            return result;
+            const response = await axios.post('/api/login', data, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            return response.data;
         },
     });
     return {

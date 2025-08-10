@@ -1,10 +1,14 @@
-export const ComponentLoader = () => {
+type ComponentLoaderProps = {
+    size?: number;
+};
+
+export const ComponentLoader = ({ size = 48 }: ComponentLoaderProps) => {
     return (
         <div className="flex items-center justify-center gap-4 sm:justify-normal">
             <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-800">
                 <svg
-                    width="48"
-                    height="48"
+                    width={size}
+                    height={size}
                     viewBox="0 0 48 48"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"

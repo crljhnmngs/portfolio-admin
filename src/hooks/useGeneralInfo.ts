@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getGeneralInfo } from '@/utils/supabase/queries/getGeneralInfo';
+import axios from 'axios';
 import { GeneralInfoResponse } from '@/types/global';
 
 export const useGeneralInfo = () => {
@@ -10,7 +10,10 @@ export const useGeneralInfo = () => {
         ...rest
     } = useQuery<GeneralInfoResponse, Error>({
         queryKey: ['general-info'],
-        queryFn: getGeneralInfo,
+        queryFn: async () => {
+            const response = await axios.get('/api/general-info');
+            return response.data.generalInfo as GeneralInfoResponse;
+        },
         staleTime: 10 * 60 * 1000, // 10 minutes
     });
 

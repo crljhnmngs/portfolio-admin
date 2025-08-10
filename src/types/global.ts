@@ -15,9 +15,9 @@ export type GeneralInfo = {
 
 export type GeneralInfoResponse = {
     id: string;
-    email: string;
-    resumeUrl: string;
-    scheduleLink: string;
+    email: string | null;
+    resumeUrl: string | null;
+    scheduleLink: string | null;
     socialLinks: Record<string, string>;
 };
 
@@ -31,12 +31,12 @@ export type SupportedLanguagesResponse = SupportedLanguage[];
 
 export type LocalizedInfoResponse = {
     id: string;
-    general_info_id: string;
+    general_info_id: string | null;
     full_name: string;
-    current_company: string;
-    current_role: string;
-    about_me: string;
-    address: string;
+    current_company: string | null;
+    current_role: string | null;
+    about_me: string | null;
+    address: string | null;
 };
 
 export type UpsertLocalizedInfoParams = {
