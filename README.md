@@ -6,7 +6,7 @@ An admin dashboard built with **Next.js** and **Prisma + PostgreSQL** to manage 
 
 -   🔐 Secure admin authentication with Lucia
 -   📝 Manage timeline, projects, and profile content (multi-language support)
--   📦 RReal-time or on-demand data fetching with Prisma + React Query
+-   📦 Real-time or on-demand data fetching with Prisma + React Query
 -   📊 Responsive dashboard UI with reusable components (Tailwind CSS)
 
 ## 🛠️ Tech Stack
