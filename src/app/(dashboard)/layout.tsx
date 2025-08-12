@@ -5,6 +5,8 @@ import AppHeader from '@/layouts/AppHeader';
 import AppSidebar from '@/layouts/AppSidebar';
 import Backdrop from '@/layouts/Backdrop';
 import React from 'react';
+import { UserProvider } from '@/contexts/UserContext';
+import { GeneralInfoProvider } from '@/contexts/GeneralInfoContext';
 
 const LayoutContent = ({ children }: { children: React.ReactNode }) => {
     const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -34,7 +36,11 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <SidebarProvider>
-            <LayoutContent>{children}</LayoutContent>
+            <UserProvider>
+                <LayoutContent>
+                    <GeneralInfoProvider>{children}</GeneralInfoProvider>
+                </LayoutContent>
+            </UserProvider>
         </SidebarProvider>
     );
 };
