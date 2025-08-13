@@ -25,7 +25,6 @@ export const NonLocalizedInfoModal = ({
     closeModal,
     initialData,
 }: NonLocalizedInfoModalProps) => {
-    const { upsertGeneralInfo, isLoading } = useUpsertGeneralInfo();
     const {
         register,
         handleSubmit,
@@ -60,22 +59,23 @@ export const NonLocalizedInfoModal = ({
         }
     }, [initialData, reset]);
 
+    const handleClose = () => {
+        reset();
+        closeModal();
+    };
+
+    const { upsertGeneralInfo, isLoading } = useUpsertGeneralInfo(handleClose);
+
     const onSubmit = async (data: GeneralInfoFormData) => {
         if (!initialData?.id) return;
 
-        try {
-            await upsertGeneralInfo({ data, id: initialData.id });
-            closeModal();
-        } catch {}
+        await upsertGeneralInfo({ data, id: initialData.id });
     };
 
     return (
         <Modal
             isOpen={isOpen}
-            onClose={() => {
-                reset();
-                closeModal();
-            }}
+            onClose={handleClose}
             className="max-w-[700px] m-4"
         >
             <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
@@ -199,10 +199,7 @@ export const NonLocalizedInfoModal = ({
                         <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
-                                reset();
-                                closeModal();
-                            }}
+                            onClick={handleClose}
                         >
                             Close
                         </Button>

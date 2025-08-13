@@ -11,10 +11,10 @@ export const NonLocalizedInfoCard = () => {
     const { generalInfo, isLoading, error, isError } = useGeneralInfoContext();
 
     useEffect(() => {
-        if (error) {
+        if (error && isError) {
             toast.error('Failed to load general information');
         }
-    }, [error]);
+    }, [error, isError]);
 
     return (
         <>
@@ -61,7 +61,7 @@ export const NonLocalizedInfoCard = () => {
                             </div>
                             <div className="flex items-center justify-center order-2 gap-2 grow xl:order-3 xl:justify-end">
                                 <a
-                                    href={generalInfo?.socialLinks.github}
+                                    href={generalInfo?.socialLinks?.github}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -98,7 +98,7 @@ export const NonLocalizedInfoCard = () => {
                                 </a>
 
                                 <a
-                                    href={generalInfo?.socialLinks.linkedin}
+                                    href={generalInfo?.socialLinks?.linkedin}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -119,7 +119,7 @@ export const NonLocalizedInfoCard = () => {
                                 </a>
 
                                 <a
-                                    href={generalInfo?.socialLinks.facebook}
+                                    href={generalInfo?.socialLinks?.facebook}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -140,7 +140,7 @@ export const NonLocalizedInfoCard = () => {
                                 </a>
 
                                 <a
-                                    href={generalInfo?.socialLinks.instagram}
+                                    href={generalInfo?.socialLinks?.instagram}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -160,7 +160,7 @@ export const NonLocalizedInfoCard = () => {
                                     </svg>
                                 </a>
                                 <a
-                                    href={generalInfo?.socialLinks.x}
+                                    href={generalInfo?.socialLinks?.x}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"

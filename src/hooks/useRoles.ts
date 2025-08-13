@@ -1,24 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { SupportedLanguagesApiResponse } from '@/types/global';
+import { RolesApiResponse } from '@/types/global';
 
-export const useSupportedLanguages = () => {
+export const useRoles = (languageCode: string) => {
     const { data, isLoading, isError, error, ...rest } = useQuery<
-        SupportedLanguagesApiResponse,
+        RolesApiResponse,
         Error
     >({
-        queryKey: ['supported-languages'],
+        queryKey: ['roles', languageCode],
         queryFn: async () => {
-            const response = await axios.get<SupportedLanguagesApiResponse>(
-                '/api/supported-languages'
-            );
+            const response = await axios.get<RolesApiResponse>('/api/roles', {
+                params: { languageCode },
+            });
             return response.data;
         },
         staleTime: 10 * 60 * 1000, // 10 minutes
     });
 
     return {
-        supportedLanguages: data?.supportedLanguages ?? [],
+        roles: data?.roles ?? [],
         isLoading,
         isError,
         error,

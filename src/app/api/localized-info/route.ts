@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { LocalizedInfoResponse } from '@/types/global';
+import { LocalizedInfo } from '@/types/global';
 
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url);
@@ -35,7 +35,7 @@ export const GET = async (req: Request) => {
             return NextResponse.json({ localizedInfo: null }, { status: 200 });
         }
 
-        const localizedInfo: LocalizedInfoResponse = {
+        const localizedInfo: LocalizedInfo = {
             id: data.id,
             general_info_id: data.general_info_id,
             full_name: data.full_name,

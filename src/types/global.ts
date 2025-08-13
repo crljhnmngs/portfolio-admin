@@ -21,15 +21,21 @@ export type GeneralInfoResponse = {
     socialLinks: Record<string, string>;
 };
 
+export type GeneralInfoApiResponse = {
+    generalInfo: GeneralInfoResponse;
+};
+
 export type SupportedLanguage = {
     code: string;
     name: string;
     is_default?: boolean;
 };
 
-export type SupportedLanguagesResponse = SupportedLanguage[];
+export type SupportedLanguagesApiResponse = {
+    supportedLanguages: SupportedLanguage[];
+};
 
-export type LocalizedInfoResponse = {
+export type LocalizedInfo = {
     id: string;
     general_info_id: string | null;
     full_name: string;
@@ -39,8 +45,30 @@ export type LocalizedInfoResponse = {
     address: string | null;
 };
 
+export type LocalizedInfoApiResponse = {
+    localizedInfo: LocalizedInfo | null;
+};
+
 export type UpsertLocalizedInfoParams = {
     generalInfoId: string;
     languageCode: string;
     data: LocalizedInfoFormData;
+};
+
+export type TranslatedRole = {
+    id?: string;
+    general_info_id?: string | null;
+    language_code?: string | null;
+    role_name: string;
+};
+
+export type RolesApiResponse = {
+    roles: TranslatedRole[];
+};
+
+export type UpsertRoleParams = {
+    id?: string;
+    generalInfoId: string;
+    languageCode: string;
+    roleName: string;
 };

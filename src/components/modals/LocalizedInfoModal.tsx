@@ -14,14 +14,14 @@ import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import RichTextEditor from '../editor/RichTextEditor';
 import { useUpsertLocalizedInfo } from '@/hooks/useUpsertLocalizedInfo';
-import { LocalizedInfoResponse } from '@/types/global';
+import { LocalizedInfo } from '@/types/global';
 import { useGeneralInfoContext } from '@/contexts/GeneralInfoContext';
 
 type LocalizedInfoModalProps = {
     isOpen: boolean;
     closeModal: () => void;
     selectedLang: string;
-    initialData: LocalizedInfoResponse | null;
+    initialData: LocalizedInfo | null;
     isLoading?: boolean;
 };
 
@@ -62,8 +62,13 @@ export const LocalizedInfoModal = ({
         }
     }, [initialData, reset]);
 
+    const handleClose = () => {
+        reset();
+        closeModal();
+    };
+
     const { upsertLocalizedInfo, isLoading: isSaving } =
-        useUpsertLocalizedInfo();
+        useUpsertLocalizedInfo(handleClose);
 
     const { generalInfo } = useGeneralInfoContext();
 
@@ -75,12 +80,6 @@ export const LocalizedInfoModal = ({
             languageCode: selectedLang,
             data,
         });
-        handleClose();
-    };
-
-    const handleClose = () => {
-        reset();
-        closeModal();
     };
 
     const aboutValue = watch('about');

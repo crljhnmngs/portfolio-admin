@@ -1,24 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { GeneralInfoResponse } from '@/types/global';
+import { GeneralInfoApiResponse } from '@/types/global';
 
 export const useGeneralInfo = () => {
-    const {
-        data: generalInfo,
-        isLoading,
-        error,
-        ...rest
-    } = useQuery<GeneralInfoResponse, Error>({
+    const { data, isLoading, error, ...rest } = useQuery<
+        GeneralInfoApiResponse,
+        Error
+    >({
         queryKey: ['general-info'],
         queryFn: async () => {
-            const response = await axios.get('/api/general-info');
-            return response.data.generalInfo as GeneralInfoResponse;
+            const response = await axios.get<GeneralInfoApiResponse>(
+                '/api/general-info'
+            );
+            return response.data;
         },
-        staleTime: 10 * 60 * 1000, // 10 minutes
+        staleTime: 10 * 60 * 1000,
     });
 
     return {
-        generalInfo,
+        generalInfo: data?.generalInfo ?? null,
         isLoading,
         error,
         ...rest,

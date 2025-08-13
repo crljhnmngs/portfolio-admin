@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { UpsertLocalizedInfoParams } from '@/types/global';
+import { UpsertRoleParams } from '@/types/global';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-export const useUpsertLocalizedInfo = (onSuccessCallback?: () => void) => {
+export const useUpsertRole = (onSuccessCallback?: () => void) => {
     const queryClient = useQueryClient();
 
     const { mutateAsync, isError, isPending, error, ...rest } = useMutation({
-        mutationFn: async (params: UpsertLocalizedInfoParams) => {
+        mutationFn: async (params: UpsertRoleParams) => {
+            console.log('useUpsertRole' + params.generalInfoId);
             const response = await axios.put(
-                `/api/localized-info/${params.generalInfoId}`,
+                `/api/roles/${params.generalInfoId}`,
                 params,
                 {
                     headers: { 'Content-Type': 'application/json' },
@@ -17,20 +18,24 @@ export const useUpsertLocalizedInfo = (onSuccessCallback?: () => void) => {
             );
             return response.data;
         },
-        onSuccess: () => {
-            toast.success('Localized info updated');
-            queryClient.invalidateQueries({ queryKey: ['localized-info'] });
+        onSuccess: (_data, params) => {
+            if (params.id) {
+                toast.success('Role updated');
+            } else {
+                toast.success('Role added');
+            }
+            queryClient.invalidateQueries({ queryKey: ['roles'] });
             if (onSuccessCallback) {
                 onSuccessCallback();
             }
         },
         onError: () => {
-            toast.error('Failed to update localized info');
+            toast.error('Failed to update role');
         },
     });
 
     return {
-        upsertLocalizedInfo: mutateAsync,
+        upsertRole: mutateAsync,
         isLoading: isPending,
         isError,
         error,

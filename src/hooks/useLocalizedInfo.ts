@@ -1,31 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { LocalizedInfoResponse } from '@/types/global';
+import { LocalizedInfoApiResponse } from '@/types/global';
 
 export const useLocalizedInfo = (
     generalInfoId: string,
     languageCode: string
 ) => {
-    const {
-        data: localizedInfo,
-        isLoading,
-        error,
-        ...rest
-    } = useQuery<LocalizedInfoResponse | null, Error>({
+    const { data, isLoading, isError, error, ...rest } = useQuery<
+        LocalizedInfoApiResponse,
+        Error
+    >({
         queryKey: ['localized-info', generalInfoId, languageCode],
         queryFn: async () => {
-            const response = await axios.get('/api/localized-info', {
-                params: { generalInfoId, languageCode },
-            });
-            return response.data.localizedInfo as LocalizedInfoResponse | null;
+            const response = await axios.get<LocalizedInfoApiResponse>(
+                '/api/localized-info',
+                { params: { generalInfoId, languageCode } }
+            );
+            return response.data;
         },
-        enabled: !!generalInfoId && !!languageCode,
+        enabled: Boolean(generalInfoId && languageCode),
         staleTime: 10 * 60 * 1000, // 10 minutes
     });
 
     return {
-        localizedInfo,
+        localizedInfo: data?.localizedInfo ?? null,
         isLoading,
+        isError,
         error,
         ...rest,
     };

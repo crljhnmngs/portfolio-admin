@@ -55,35 +55,40 @@ model translated_roles {
   general_info_id     String?              @db.Uuid
   language_code       String?
   role_name           String
+  created_at          DateTime?            @default(now()) @db.Timestamptz(6)
   general_info        general_info?        @relation(fields: [general_info_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   supported_languages supported_languages? @relation(fields: [language_code], references: [code], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
+  id             String    @id @default(cuid())
+  email          String    @unique
   hashedPassword String
   firstName      String
   lastName       String
-  createdAt      DateTime @default(now())
-
-  sessions       Session[]
+  createdAt      DateTime  @default(now())
   keys           Key[]
+  sessions       Session[]
 }
 
 model Session {
   id        String   @id @default(cuid())
   userId    String
   expiresAt DateTime
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Key {
-  id             String   @id
+  id             String  @id
   userId         String
   hashedPassword String?
-  primary        Boolean  @default(false)
+  primary        Boolean @default(false)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model skills {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  icon_url String
+  category String
 }

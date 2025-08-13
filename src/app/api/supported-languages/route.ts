@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { SupportedLanguagesResponse } from '@/types/global';
 
 export const GET = async () => {
     try {
@@ -16,7 +15,7 @@ export const GET = async () => {
         });
 
         return NextResponse.json({
-            supportedLanguages: languages as SupportedLanguagesResponse,
+            supportedLanguages: languages,
         });
     } catch (error) {
         console.error('Error fetching supported languages:', error);

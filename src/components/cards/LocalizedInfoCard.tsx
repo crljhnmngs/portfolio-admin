@@ -23,10 +23,10 @@ export const LocalizedInfoCard = () => {
     } = useLocalizedInfo(generalInfo?.id || '', selectedLang);
 
     useEffect(() => {
-        if (error) {
+        if (error && isError) {
             toast.error('Failed to load localized information');
         }
-    }, [error]);
+    }, [error, isError]);
 
     const aboutHtml = localizedInfo?.about_me
         ? draftToHtml(
