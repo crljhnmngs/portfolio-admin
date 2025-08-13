@@ -15,7 +15,7 @@ export const RolesCard = () => {
     const selectedLang = useLanguageStore((s) => s.selectedLang);
     const [editingRole, setEditingRole] = useState<TranslatedRole | null>(null);
     const { roles, isLoading, error, isError } = useRoles(selectedLang);
-    console.log(roles);
+
     useEffect(() => {
         if (isError && error) {
             toast.error('Failed to load roles');

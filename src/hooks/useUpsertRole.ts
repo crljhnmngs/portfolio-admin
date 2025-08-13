@@ -8,7 +8,6 @@ export const useUpsertRole = (onSuccessCallback?: () => void) => {
 
     const { mutateAsync, isError, isPending, error, ...rest } = useMutation({
         mutationFn: async (params: UpsertRoleParams) => {
-            console.log('useUpsertRole' + params.generalInfoId);
             const response = await axios.put(
                 `/api/roles/${params.generalInfoId}`,
                 params,
