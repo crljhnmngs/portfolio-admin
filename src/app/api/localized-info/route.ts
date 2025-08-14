@@ -4,12 +4,11 @@ import { LocalizedInfo } from '@/types/global';
 
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url);
-    const generalInfoId = searchParams.get('generalInfoId') || '';
     const languageCode = searchParams.get('languageCode') || '';
 
-    if (!generalInfoId || !languageCode) {
+    if (!languageCode) {
         return NextResponse.json(
-            { error: 'Missing generalInfoId or languageCode' },
+            { error: 'Missing languageCode' },
             { status: 400 }
         );
     }
@@ -17,7 +16,6 @@ export const GET = async (req: Request) => {
     try {
         const data = await prisma.general_translations.findFirst({
             where: {
-                general_info_id: generalInfoId,
                 language_code: languageCode,
             },
             select: {

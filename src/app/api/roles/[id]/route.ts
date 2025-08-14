@@ -64,3 +64,50 @@ export const PUT = async (
         );
     }
 };
+
+export const DELETE = async (
+    _req: Request,
+    { params }: { params: { id: string } }
+) => {
+    try {
+        const cookieStore = await cookies();
+        const sessionId =
+            cookieStore.get(lucia.sessionCookieName)?.value ?? null;
+
+        if (!sessionId) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const { session, user } = await lucia.validateSession(sessionId);
+        if (!session || !user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const { id: roleId } = await params;
+
+        if (!roleId) {
+            return NextResponse.json(
+                { error: 'Role ID is required' },
+                { status: 400 }
+            );
+        }
+
+        await prisma.translated_roles.delete({
+            where: { id: roleId },
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting role:', error);
+        return NextResponse.json(
+            { error: 'Failed to delete role' },
+            { status: 500 }
+        );
+    }
+};

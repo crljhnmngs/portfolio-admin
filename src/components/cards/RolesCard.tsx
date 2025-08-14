@@ -9,12 +9,16 @@ import { RoleModal } from '../modals/RoleModal';
 import { TranslatedRole } from '@/types/global';
 import { useRoles } from '@/hooks/useRoles';
 import toast from 'react-hot-toast';
+import { ConfirmationModal } from '../modals/ConfirmationModal';
+import { useDeleteRole } from '@/hooks/useDeleteRole';
 
 export const RolesCard = () => {
     const { openModal, closeModal, isOpen } = useModal();
     const selectedLang = useLanguageStore((s) => s.selectedLang);
     const [editingRole, setEditingRole] = useState<TranslatedRole | null>(null);
     const { roles, isLoading, error, isError } = useRoles(selectedLang);
+    const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+    const { deleteRole, isLoading: isDeleting } = useDeleteRole();
 
     useEffect(() => {
         if (isError && error) {
@@ -24,12 +28,25 @@ export const RolesCard = () => {
 
     const handleAdd = () => {
         setEditingRole(null);
-        openModal();
+        openModal('role');
     };
 
     const handleEdit = (role: TranslatedRole) => {
         setEditingRole(role);
-        openModal();
+        openModal('role');
+    };
+
+    const handleDelete = (id: string) => {
+        openModal('confirm');
+        setDeleteTargetId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (deleteTargetId) {
+            await deleteRole(deleteTargetId);
+        }
+        setDeleteTargetId(null);
+        closeModal();
     };
 
     return (
@@ -69,7 +86,12 @@ export const RolesCard = () => {
                                                 >
                                                     <HiOutlinePencil className="size-5" />
                                                 </button>
-                                                <button className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
+                                                <button
+                                                    className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
+                                                    onClick={() =>
+                                                        handleDelete(role.id!)
+                                                    }
+                                                >
                                                     <IoTrashOutline className="size-5" />
                                                 </button>
                                             </div>
@@ -117,9 +139,22 @@ export const RolesCard = () => {
             </div>
             <RoleModal
                 initialData={editingRole}
-                isOpen={isOpen}
+                isOpen={isOpen('role')}
                 closeModal={closeModal}
                 selectedLang={selectedLang}
+            />
+            <ConfirmationModal
+                isOpen={isOpen('confirm')}
+                closeModal={() => {
+                    setDeleteTargetId(null);
+                    closeModal();
+                }}
+                title="Delete Item"
+                description="Are you sure you want to delete this item? This action cannot be undone."
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                onConfirm={confirmDelete}
+                loading={isDeleting}
             />
         </>
     );
