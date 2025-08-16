@@ -49,6 +49,7 @@ import DocsIcon from './docs.svg';
 import MailIcon from './mail-line.svg';
 import HorizontaLDots from './horizontal-dots.svg';
 import ChatIcon from './chat.svg';
+import Skills from './skills.svg';
 
 export {
     DownloadIcon,
@@ -102,4 +103,5 @@ export {
     HorizontaLDots,
     ChevronUpIcon,
     ChatIcon,
+    Skills,
 };

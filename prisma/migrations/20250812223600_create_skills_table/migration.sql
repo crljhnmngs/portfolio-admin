@@ -3,4 +3,5 @@ CREATE TABLE skills (
     name TEXT NOT NULL,
     icon_url TEXT NOT NULL,
     category TEXT NOT NULL
+    created_at TIMESTAMPTZ(6) NOT NULL DEFAULT NOW()
 );

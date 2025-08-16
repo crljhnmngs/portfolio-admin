@@ -72,3 +72,21 @@ export type UpsertRoleParams = {
     languageCode: string;
     roleName: string;
 };
+
+export type Skill = {
+    id: string;
+    name: string;
+    icon_url: string;
+    category: string;
+};
+
+export type SkillsApiResponse = {
+    skills: Skill[];
+};
+
+export type UpsertSkillParams = {
+    id?: string;
+    name: string;
+    icon_url: string;
+    category: string;
+};

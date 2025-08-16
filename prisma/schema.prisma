@@ -87,8 +87,9 @@ model Key {
 }
 
 model skills {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String
-  icon_url String
-  category String
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  icon_url    String
+  category    String
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
 }

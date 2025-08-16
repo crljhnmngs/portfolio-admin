@@ -7,6 +7,7 @@ import {
     ChevronDownIcon,
     GridIcon,
     HorizontaLDots,
+    Skills,
     UserCircleIcon,
 } from '../icons/index';
 
@@ -27,6 +28,11 @@ const navItems: NavItem[] = [
         icon: <UserCircleIcon />,
         name: 'General Info',
         path: '/general-info',
+    },
+    {
+        icon: <Skills />,
+        name: 'Skills',
+        path: '/skills',
     },
 ];
 

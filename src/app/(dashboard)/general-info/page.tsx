@@ -2,6 +2,13 @@ import { LocalizedInfoCard } from '@/components/cards/LocalizedInfoCard';
 import { NonLocalizedInfoCard } from '@/components/cards/NonLocalizedInfoCard';
 import { RolesCard } from '@/components/cards/RolesCard';
 import { PageBreadcrumb } from '@/components/common/PageBreadCrumb';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'General Info | Carl John Manigos Portfolio',
+    description:
+        'View and manage the general information of your personal portfolio.',
+};
 
 const GeneralInfo = () => {
     return (
