@@ -48,6 +48,7 @@ model supported_languages {
   is_default           Boolean?               @default(false)
   general_translations general_translations[]
   translated_roles     translated_roles[]
+  experiences     experiences[]
 }
 
 model translated_roles {
@@ -92,4 +93,81 @@ model skills {
   icon_url    String
   category    String
   created_at  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model experiences {
+  id            String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  logo          String?
+  title         String
+  role          String?
+  description   String?
+  link          String?
+  date          String?
+  language_code String
+  created_at    DateTime             @default(now()) @db.Timestamptz(6)
+
+  supported_languages supported_languages? @relation(fields: [language_code], references: [code], onDelete: Cascade, onUpdate: NoAction)
+  sub_items           sub_items[]
+  experience_tech     experience_tech[]
+
+  @@index([language_code])
+}
+
+model sub_items {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  experience_id String       @db.Uuid
+  position      String?
+  setup         String?
+  date          String?
+  created_at    DateTime     @default(now()) @db.Timestamptz(6)
+
+  experiences experiences @relation(fields: [experience_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  projects    projects[]
+
+  @@index([experience_id])
+}
+
+model projects {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sub_item_id  String       @db.Uuid
+  description  String?
+  created_at   DateTime     @default(now()) @db.Timestamptz(6)
+
+  sub_items    sub_items    @relation(fields: [sub_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  project_tech project_tech[]
+
+  @@index([sub_item_id])
+}
+
+model tech {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String           @unique
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+
+  experience_tech experience_tech[]
+  project_tech    project_tech[]
+}
+
+model experience_tech {
+  experience_id String @db.Uuid
+  tech_id       String @db.Uuid
+
+  experiences experiences @relation(fields: [experience_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tech        tech        @relation(fields: [tech_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([experience_id, tech_id])
+  @@index([experience_id])
+  @@index([tech_id])
+}
+
+model project_tech {
+  project_id String @db.Uuid
+  tech_id    String @db.Uuid
+
+  projects projects @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tech     tech     @relation(fields: [tech_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([project_id, tech_id])
+  @@index([project_id])
+  @@index([tech_id])
 }

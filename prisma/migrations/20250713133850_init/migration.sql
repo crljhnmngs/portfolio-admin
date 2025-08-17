@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS translated_roles (
     general_info_id UUID REFERENCES general_info(id) ON DELETE CASCADE,
     language_code TEXT REFERENCES supported_languages(code) ON DELETE CASCADE,
     role_name TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 -- Table: social_profiles
