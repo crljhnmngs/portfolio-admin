@@ -742,3 +742,19 @@ span.flatpickr-weekday,
     opacity: 0.8;
     cursor: grabbing; /* Changes the cursor to indicate dragging */
 }
+
+.flatpickr-monthSelect-month {
+    @apply !text-gray-500  dark:!text-gray-400;
+}
+
+.flatpickr-monthSelect-month.selected {
+    @apply !text-white;
+}
+
+.flatpickr-monthSelect-month:hover {
+    @apply dark:!text-black;
+}
+
+.flatpickr-monthSelect-month.selected:hover {
+    @apply dark:!text-white;
+}

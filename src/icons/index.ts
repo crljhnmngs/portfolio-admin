@@ -50,6 +50,7 @@ import MailIcon from './mail-line.svg';
 import HorizontaLDots from './horizontal-dots.svg';
 import ChatIcon from './chat.svg';
 import Skills from './skills.svg';
+import Experience from './experience.svg';
 
 export {
     DownloadIcon,
@@ -104,4 +105,5 @@ export {
     ChevronUpIcon,
     ChatIcon,
     Skills,
+    Experience,
 };

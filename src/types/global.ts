@@ -1,4 +1,5 @@
 import { LocalizedInfoFormData } from '@/utils/validation/localizedInfoSchema';
+import { ExperienceFormData } from '@/utils/validation/experienceSchema';
 
 export type SocialProfile = {
     platform: string;
@@ -89,4 +90,38 @@ export type UpsertSkillParams = {
     name: string;
     icon_url: string;
     category: string;
+};
+
+export type Project = {
+    id: string;
+    description: string;
+    tech?: string[];
+};
+
+export type SubItem = {
+    id: string;
+    position: string;
+    setup: string;
+    start_date: string;
+    end_date: string;
+    projects: Project[];
+};
+
+export type Experience = {
+    id: string;
+    company: string;
+    role: string;
+    start_date: string;
+    end_date: string;
+    logo: string;
+    link: string;
+    description: string;
+    tech: string[];
+    sub_items?: SubItem[];
+};
+
+export type UpsertExperienceParams = {
+    id: string;
+    languageCode: string;
+    data: ExperienceFormData;
 };
