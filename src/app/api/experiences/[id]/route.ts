@@ -301,3 +301,62 @@ export const PUT = async (
         );
     }
 };
+
+export const DELETE = async (
+    _req: Request,
+    { params }: { params: { id: string } }
+) => {
+    try {
+        const cookieStore = await cookies();
+        const sessionId =
+            cookieStore.get(lucia.sessionCookieName)?.value ?? null;
+
+        if (!sessionId) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const { session, user } = await lucia.validateSession(sessionId);
+        if (!session || !user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const { id: experienceId } = await params;
+
+        if (!experienceId) {
+            return NextResponse.json(
+                { error: 'ExperienceId ID is required' },
+                { status: 400 }
+            );
+        }
+
+        const existingExperience = await prisma.experiences.findUnique({
+            where: { id: experienceId },
+            select: { id: true, company: true },
+        });
+
+        if (!existingExperience) {
+            return NextResponse.json(
+                { error: 'Experience not found' },
+                { status: 404 }
+            );
+        }
+
+        await prisma.experiences.delete({
+            where: { id: experienceId },
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting experience:', error);
+        return NextResponse.json(
+            { error: 'Failed to delete experience' },
+            { status: 500 }
+        );
+    }
+};

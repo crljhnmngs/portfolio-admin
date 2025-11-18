@@ -125,3 +125,7 @@ export type UpsertExperienceParams = {
     languageCode: string;
     data: ExperienceFormData;
 };
+
+export type ExperiencesApiResponse = {
+    experiences: Experience[];
+};

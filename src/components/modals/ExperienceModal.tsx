@@ -15,7 +15,7 @@ import { Experience } from '@/types/global';
 import RichTextEditor from '../editor/RichTextEditor';
 import MonthYearPicker from '../common/MonthYearPicker';
 import SubItems from '../experience/SubItems';
-import { useUpsertExperience } from '@/hooks/useUpsertExperience';
+import { useUpsertExperience } from '@/hooks/experiences/useUpsertExperience';
 
 type ExperienceModalProps = {
     isOpen: boolean;
@@ -90,7 +90,17 @@ export const ExperienceModal = ({
     }, [isOpen, initialData, reset]);
 
     const handleClose = () => {
-        reset();
+        reset({
+            company: '',
+            role: '',
+            start_date: '',
+            end_date: '',
+            logo: '',
+            link: '',
+            description: '',
+            tech: [],
+            sub_items: [],
+        });
         closeModal();
     };
 
@@ -124,54 +134,74 @@ export const ExperienceModal = ({
                     onSubmit={handleSubmit(onSubmit)}
                     className="flex flex-col gap-4 "
                 >
-                    <div className="custom-scrollbar h-[450px] overflow-y-auto w-full px-2 pb-3 space-y-8">
-                        <Input
-                            placeholder="Company"
-                            register={register('company')}
-                            error={!!errors.company}
-                            hint={errors.company?.message || ''}
-                        />
-
-                        <Input
-                            placeholder="Role"
-                            register={register('role')}
-                            error={!!errors.role}
-                            hint={errors.role?.message || ''}
-                        />
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <MonthYearPicker
-                                id="start_date"
-                                placeholder="Start Date"
-                                register={register('start_date')}
-                                setValue={setValue}
-                                error={!!errors.start_date}
-                                hint={errors.start_date?.message || ''}
+                    <div className="custom-scrollbar h-[450px] overflow-y-auto w-full px-2 pb-3 space-y-5">
+                        <div className="col-span-2 lg:col-span-1">
+                            <Label>Company</Label>
+                            <Input
+                                type="text"
+                                placeholder="Your company"
+                                register={register('company')}
+                                error={!!errors.company}
+                                hint={errors.company?.message || ''}
                             />
-                            <MonthYearPicker
-                                id="end_date"
-                                placeholder="End Date"
-                                register={register('end_date')}
-                                setValue={setValue}
-                                error={!!errors.end_date}
-                                hint={errors.end_date?.message || ''}
-                                allowPresent={true}
+                        </div>
+                        <div className="col-span-2 lg:col-span-1">
+                            <Label>Role</Label>
+                            <Input
+                                type="text"
+                                placeholder="Your role"
+                                register={register('role')}
+                                error={!!errors.role}
+                                hint={errors.role?.message || ''}
                             />
                         </div>
 
-                        <Input
-                            placeholder="Logo URL"
-                            register={register('logo')}
-                            error={!!errors.logo}
-                            hint={errors.logo?.message || ''}
-                        />
-                        <Input
-                            placeholder="Company Link"
-                            register={register('link')}
-                            error={!!errors.link}
-                            hint={errors.link?.message || ''}
-                        />
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="col-span-2 lg:col-span-1">
+                                <Label>Start Date</Label>
+                                <MonthYearPicker
+                                    id="start_date"
+                                    placeholder="Your Start Date"
+                                    register={register('start_date')}
+                                    setValue={setValue}
+                                    error={!!errors.start_date}
+                                    hint={errors.start_date?.message || ''}
+                                />
+                            </div>
+                            <div className="col-span-2 lg:col-span-1">
+                                <Label>End Date</Label>
+                                <MonthYearPicker
+                                    id="end_date"
+                                    placeholder="Your End Date"
+                                    register={register('end_date')}
+                                    setValue={setValue}
+                                    error={!!errors.end_date}
+                                    hint={errors.end_date?.message || ''}
+                                    allowPresent={true}
+                                />
+                            </div>
+                        </div>
 
+                        <div className="col-span-2 lg:col-span-1">
+                            <Label>Company Logo URL</Label>
+                            <Input
+                                type="text"
+                                placeholder="Enter Company Logo URL"
+                                register={register('logo')}
+                                error={!!errors.logo}
+                                hint={errors.logo?.message || ''}
+                            />
+                        </div>
+                        <div className="col-span-2 lg:col-span-1">
+                            <Label>Company Link</Label>
+                            <Input
+                                type="text"
+                                placeholder="Enter Company Link"
+                                register={register('link')}
+                                error={!!errors.link}
+                                hint={errors.link?.message || ''}
+                            />
+                        </div>
                         <div className="col-span-2">
                             <Label>Description</Label>
                             <RichTextEditor
