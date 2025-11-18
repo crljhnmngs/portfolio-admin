@@ -13,7 +13,7 @@ import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
 import RichTextEditor from '../editor/RichTextEditor';
-import { useUpsertLocalizedInfo } from '@/hooks/useUpsertLocalizedInfo';
+import { useUpsertLocalizedInfo } from '@/hooks/localizedInfo/useUpsertLocalizedInfo';
 import { LocalizedInfo } from '@/types/global';
 import { useGeneralInfoContext } from '@/contexts/GeneralInfoContext';
 

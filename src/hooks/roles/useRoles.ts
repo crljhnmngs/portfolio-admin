@@ -16,7 +16,6 @@ export const useRoles = (languageCode: string) => {
         },
         staleTime: 10 * 60 * 1000, // 10 minutes
     });
-
     return {
         roles: data?.roles ?? [],
         isLoading,

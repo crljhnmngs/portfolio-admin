@@ -7,10 +7,10 @@ import { IoTrashOutline } from 'react-icons/io5';
 import { HiOutlinePencil } from 'react-icons/hi';
 import { RoleModal } from '../modals/RoleModal';
 import { TranslatedRole } from '@/types/global';
-import { useRoles } from '@/hooks/useRoles';
+import { useRoles } from '@/hooks/roles/useRoles';
 import toast from 'react-hot-toast';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
-import { useDeleteRole } from '@/hooks/useDeleteRole';
+import { useDeleteRole } from '@/hooks/roles/useDeleteRole';
 
 export const RolesCard = () => {
     const { openModal, closeModal, isOpen } = useModal();

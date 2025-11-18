@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormData } from '@/utils/validation/loginSchema';
-import { useLogin } from '@/hooks/useLogin';
+import { useLogin } from '@/hooks/auth/useLogin';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';

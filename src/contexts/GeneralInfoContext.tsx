@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext } from 'react';
-import { useGeneralInfo } from '@/hooks/useGeneralInfo';
+import { useGeneralInfo } from '@/hooks/generalInfo/useGeneralInfo';
 
 type GeneralInfoContextType = ReturnType<typeof useGeneralInfo>;
 

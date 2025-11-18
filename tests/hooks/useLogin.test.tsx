@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useLogin } from '@/hooks/useLogin';
+import { useLogin } from '@/hooks/auth/useLogin';
 import * as reactQuery from '@tanstack/react-query';
 import * as authActions from '@/utils/supabase/actions/auth';
 

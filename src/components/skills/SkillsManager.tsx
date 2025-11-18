@@ -1,7 +1,7 @@
 'use client';
 
 import { SkillCard } from '@/components/cards/SkillCard';
-import { useSkills } from '@/hooks/useSkills';
+import { useSkills } from '@/hooks/skills/useSkills';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ComponentLoader } from '../loaders/ComponentLoader';
@@ -9,7 +9,7 @@ import { useModal } from '@/hooks/useModal';
 import { SkillModal } from '../modals/SkillModal';
 import { Skill } from '@/types/global';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
-import { useDeleteSkill } from '@/hooks/useDeleteSkill';
+import { useDeleteSkill } from '@/hooks/skills/useDeleteSkill';
 
 export const SkillsManager = () => {
     const { skills, isLoading, error } = useSkills();

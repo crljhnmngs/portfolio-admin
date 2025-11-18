@@ -4,7 +4,7 @@ import { useModal } from '../../hooks/useModal';
 import { useLanguageStore } from '@/stores/languageStore';
 import { LocalizedInfoModal } from '../modals/LocalizedInfoModal';
 import { useGeneralInfoContext } from '@/contexts/GeneralInfoContext';
-import { useLocalizedInfo } from '@/hooks/useLocalizedInfo';
+import { useLocalizedInfo } from '@/hooks/localizedInfo/useLocalizedInfo';
 import { ComponentLoader } from '../loaders/ComponentLoader';
 import toast from 'react-hot-toast';
 import draftToHtml from 'draftjs-to-html';

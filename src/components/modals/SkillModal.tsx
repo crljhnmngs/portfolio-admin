@@ -8,7 +8,7 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
-import { useUpsertSkill } from '@/hooks/useUpsertSkill';
+import { useUpsertSkill } from '@/hooks/skills/useUpsertSkill';
 import { Skill } from '@/types/global';
 
 type SkillModalProps = {

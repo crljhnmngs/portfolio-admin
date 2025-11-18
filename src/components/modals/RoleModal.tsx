@@ -8,7 +8,7 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
-import { useUpsertRole } from '@/hooks/useUpsertRole';
+import { useUpsertRole } from '@/hooks/roles/useUpsertRole';
 import { TranslatedRole } from '@/types/global';
 import { useGeneralInfoContext } from '@/contexts/GeneralInfoContext';
 
