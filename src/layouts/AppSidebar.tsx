@@ -11,6 +11,7 @@ import {
     UserCircleIcon,
     Experience,
 } from '../icons/index';
+import { GraduationCap } from 'lucide-react';
 
 type NavItem = {
     name: string;
@@ -39,6 +40,11 @@ const navItems: NavItem[] = [
         icon: <Experience />,
         name: 'Experience',
         path: '/experience',
+    },
+    {
+        icon: <GraduationCap className="w-7 h-7" strokeWidth={0.75} />,
+        name: 'Education',
+        path: '/education',
     },
 ];
 

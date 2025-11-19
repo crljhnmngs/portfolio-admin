@@ -129,3 +129,36 @@ export type UpsertExperienceParams = {
 export type ExperiencesApiResponse = {
     experiences: Experience[];
 };
+
+export type EducationFormData = {
+    school: string;
+    track: string;
+    course: string;
+    start_date: string;
+    end_date: string;
+    logo_url?: string;
+    tech: string[];
+};
+
+export type UpsertEducationParams = {
+    id?: string;
+    languageCode: string;
+    data: EducationFormData;
+};
+
+export type Education = {
+    id: string;
+    school: string;
+    track: string;
+    course: string;
+    start_date: string;
+    end_date: string;
+    logo_url?: string;
+    language_code: string;
+    tech: string[];
+    created_at?: Date;
+};
+
+export type EducationsApiResponse = {
+    educations: Education[];
+};

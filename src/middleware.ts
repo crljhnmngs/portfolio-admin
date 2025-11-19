@@ -6,6 +6,7 @@ const protectedRoutes = [
     '/general-info',
     '/skills',
     '/experience',
+    '/education',
 ];
 const authRoutes = ['/'];
 
@@ -34,5 +35,6 @@ export const config = {
         '/general-info',
         '/skills',
         '/experience',
+        '/education',
     ],
 };

@@ -13,6 +13,7 @@ import draftToHtml from 'draftjs-to-html';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
 import { useDeleteExperience } from '@/hooks/experiences/useDeleteExperience';
 import { formatMonthYear } from '@/utils/helpers';
+import Image from 'next/image';
 
 export const ExperienceManager = () => {
     const { openModal, closeModal, isOpen } = useModal();
@@ -116,10 +117,13 @@ export const ExperienceManager = () => {
                                     <div className="flex items-start gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
                                         {exp.logo && (
                                             <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700 p-2">
-                                                <img
+                                                <Image
                                                     src={exp.logo}
                                                     alt={exp.company}
-                                                    className="w-full h-full object-contain"
+                                                    width={64}
+                                                    height={64}
+                                                    sizes="64px"
+                                                    className="object-contain"
                                                 />
                                             </div>
                                         )}
