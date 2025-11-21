@@ -162,3 +162,20 @@ export type Education = {
 export type EducationsApiResponse = {
     educations: Education[];
 };
+
+type Links = {
+    github?: string;
+    live?: string;
+};
+export type Projects = {
+    id: string;
+    name: string;
+    image_url: string;
+    about: string;
+    tech: string[];
+    date: string;
+    new?: boolean;
+    dev?: boolean;
+    links: Links;
+    created_at?: Date;
+};
