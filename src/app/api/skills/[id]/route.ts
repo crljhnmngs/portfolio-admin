@@ -1,32 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { cookies } from 'next/headers';
-import { lucia } from '@/lib/auth';
 import { UpsertSkillParams } from '@/types/global';
+import { validateSession } from '@/lib/auth-helpers';
 
 export const PUT = async (
     req: Request,
     { params }: { params: { id?: string } }
 ) => {
     try {
-        const cookieStore = await cookies();
-        const sessionId =
-            cookieStore.get(lucia.sessionCookieName)?.value ?? null;
-
-        if (!sessionId) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        const { session, user } = await lucia.validateSession(sessionId);
-        if (!session || !user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
+        const auth = await validateSession();
+        if (!auth.valid) return auth.response;
 
         const { id: skillId } = await params;
         const body: UpsertSkillParams = await req.json();
@@ -72,24 +55,8 @@ export const DELETE = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const cookieStore = await cookies();
-        const sessionId =
-            cookieStore.get(lucia.sessionCookieName)?.value ?? null;
-
-        if (!sessionId) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        const { session, user } = await lucia.validateSession(sessionId);
-        if (!session || !user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
+        const auth = await validateSession();
+        if (!auth.valid) return auth.response;
 
         const { id: skillId } = await params;
 

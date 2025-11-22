@@ -1,27 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { GeneralInfoFormData } from '@/utils/validation/generalInfoSchema';
-import { cookies } from 'next/headers';
-import { lucia } from '@/lib/auth';
+import { validateSession } from '@/lib/auth-helpers';
 
 export const PUT = async (
     req: Request,
     context: { params: Promise<{ id: string }> }
 ) => {
     try {
-        const cookieStore = await cookies();
-        const sessionId =
-            cookieStore.get(lucia.sessionCookieName)?.value ?? null;
-
-        if (!sessionId) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const { session, user } = await lucia.validateSession(sessionId);
-
-        if (!session || !user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const auth = await validateSession();
+        if (!auth.valid) return auth.response;
 
         const { id } = await context.params;
         const body: GeneralInfoFormData = await req.json();

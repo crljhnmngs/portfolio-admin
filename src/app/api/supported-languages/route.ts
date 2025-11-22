@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { validateApiKey } from '@/lib/auth-helpers';
+import { handleCorsOptions } from '@/lib/cors-helpers';
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
     try {
+        const auth = validateApiKey(req);
+        if (!auth.valid) return auth.response;
+
         const languages = await prisma.supported_languages.findMany({
             select: {
                 code: true,
@@ -14,9 +19,23 @@ export const GET = async () => {
             },
         });
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             supportedLanguages: languages,
         });
+
+        if (auth.origin) {
+            response.headers.set('Access-Control-Allow-Origin', auth.origin);
+            response.headers.set(
+                'Access-Control-Allow-Methods',
+                'GET, OPTIONS'
+            );
+            response.headers.set(
+                'Access-Control-Allow-Headers',
+                'Content-Type, x-api-key'
+            );
+        }
+
+        return response;
     } catch (error) {
         console.error('Error fetching supported languages:', error);
         return NextResponse.json(
@@ -25,3 +44,5 @@ export const GET = async () => {
         );
     }
 };
+
+export const OPTIONS = handleCorsOptions;

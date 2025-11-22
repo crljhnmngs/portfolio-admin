@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { validateApiKey } from '@/lib/auth-helpers';
+import { handleCorsOptions } from '@/lib/cors-helpers';
 
 export const GET = async (req: Request) => {
     try {
+        const auth = validateApiKey(req);
+        if (!auth.valid) return auth.response;
+
         const { searchParams } = new URL(req.url);
         const languageCode = searchParams.get('languageCode') || '';
 
@@ -26,9 +31,23 @@ export const GET = async (req: Request) => {
             orderBy: { created_at: 'asc' },
         });
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             roles,
         });
+
+        if (auth.origin) {
+            response.headers.set('Access-Control-Allow-Origin', auth.origin);
+            response.headers.set(
+                'Access-Control-Allow-Methods',
+                'GET, OPTIONS'
+            );
+            response.headers.set(
+                'Access-Control-Allow-Headers',
+                'Content-Type, x-api-key'
+            );
+        }
+
+        return response;
     } catch (error) {
         console.error('Error fetching translated roles:', error);
         return NextResponse.json(
@@ -37,3 +56,5 @@ export const GET = async (req: Request) => {
         );
     }
 };
+
+export const OPTIONS = handleCorsOptions;

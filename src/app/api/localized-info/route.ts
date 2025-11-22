@@ -1,19 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { LocalizedInfo } from '@/types/global';
+import { validateApiKey } from '@/lib/auth-helpers';
+import { handleCorsOptions } from '@/lib/cors-helpers';
 
 export const GET = async (req: Request) => {
-    const { searchParams } = new URL(req.url);
-    const languageCode = searchParams.get('languageCode') || '';
-
-    if (!languageCode) {
-        return NextResponse.json(
-            { error: 'Missing languageCode' },
-            { status: 400 }
-        );
-    }
-
     try {
+        const auth = validateApiKey(req);
+        if (!auth.valid) return auth.response;
+
+        const { searchParams } = new URL(req.url);
+        const languageCode = searchParams.get('languageCode') || '';
+
+        if (!languageCode) {
+            return NextResponse.json(
+                { error: 'Missing languageCode' },
+                { status: 400 }
+            );
+        }
+
         const data = await prisma.general_translations.findFirst({
             where: {
                 language_code: languageCode,
@@ -43,7 +48,21 @@ export const GET = async (req: Request) => {
             address: data.address,
         };
 
-        return NextResponse.json({ localizedInfo });
+        const response = NextResponse.json({ localizedInfo });
+
+        if (auth.origin) {
+            response.headers.set('Access-Control-Allow-Origin', auth.origin);
+            response.headers.set(
+                'Access-Control-Allow-Methods',
+                'GET, OPTIONS'
+            );
+            response.headers.set(
+                'Access-Control-Allow-Headers',
+                'Content-Type, x-api-key'
+            );
+        }
+
+        return response;
     } catch (error) {
         console.error('Error fetching localized_info:', error);
         return NextResponse.json(
@@ -52,3 +71,5 @@ export const GET = async (req: Request) => {
         );
     }
 };
+
+export const OPTIONS = handleCorsOptions;

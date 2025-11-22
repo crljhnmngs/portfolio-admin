@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { GeneralInfoResponse } from '@/types/global';
+import { validateApiKey } from '@/lib/auth-helpers';
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
     try {
+        const auth = validateApiKey(req);
+        if (!auth.valid) return auth.response;
+
         const data = await prisma.general_info.findFirst({
             select: {
                 id: true,
@@ -42,7 +46,21 @@ export const GET = async () => {
             socialLinks,
         };
 
-        return NextResponse.json({ generalInfo });
+        const response = NextResponse.json({ generalInfo });
+
+        if (auth.origin) {
+            response.headers.set('Access-Control-Allow-Origin', auth.origin);
+            response.headers.set(
+                'Access-Control-Allow-Methods',
+                'GET, OPTIONS'
+            );
+            response.headers.set(
+                'Access-Control-Allow-Headers',
+                'Content-Type, x-api-key'
+            );
+        }
+
+        return response;
     } catch (error) {
         console.error('Error fetching general_info:', error);
         return NextResponse.json(
