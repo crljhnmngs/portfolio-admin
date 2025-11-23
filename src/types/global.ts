@@ -167,6 +167,7 @@ type Links = {
     github?: string;
     live?: string;
 };
+
 export type Projects = {
     id: string;
     name: string;
@@ -177,5 +178,24 @@ export type Projects = {
     new?: boolean;
     dev?: boolean;
     links: Links;
+    language_code: string;
     created_at?: Date;
+};
+
+export type UpsertProjectParams = {
+    id?: string;
+    name: string;
+    image_url: string;
+    about: string;
+    date: string;
+    github?: string;
+    live?: string;
+    new?: boolean;
+    dev?: boolean;
+    language_code: string;
+    tech: string[];
+};
+
+export type ProjectsApiResponse = {
+    projects: Projects[];
 };

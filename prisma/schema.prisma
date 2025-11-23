@@ -46,10 +46,11 @@ model supported_languages {
   code                 String                 @id
   name                 String
   is_default           Boolean?               @default(false)
-  general_translations general_translations[]
-  translated_roles     translated_roles[]
-  experiences          experiences[]
-  educations           educations[]
+  general_translations  general_translations[]
+  translated_roles      translated_roles[]
+  experiences           experiences[]
+  educations            educations[]
+  portfolio_projects    portfolio_projects[]
 }
 
 model translated_roles {
@@ -147,9 +148,10 @@ model tech {
   name           String           @unique
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
 
-  experience_tech experience_tech[]
-  project_tech    project_tech[]
-  education_tech  education_tech[]
+  experience_tech         experience_tech[]
+  project_tech            project_tech[]
+  education_tech          education_tech[]
+  portfolio_project_tech  portfolio_project_tech[]
 }
 
 model experience_tech {
@@ -202,5 +204,38 @@ model education_tech {
 
   @@id([education_id, tech_id])
   @@index([education_id])
+  @@index([tech_id])
+}
+
+model portfolio_projects {
+  id              String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  image_url       String
+  about           String
+  date            String
+  new             Boolean                  @default(false)
+  dev             Boolean                  @default(false)
+  github          String?
+  live            String?
+  language_code   String
+  created_at      DateTime                 @default(now()) @db.Timestamptz(6)
+
+  supported_languages supported_languages? @relation(fields: [language_code], references: [code], onDelete: Cascade, onUpdate: NoAction)
+  portfolio_project_tech portfolio_project_tech[]
+
+  @@index([language_code])
+}
+
+model portfolio_project_tech {
+  id                   String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  portfolio_project_id String             @db.Uuid
+  tech_id              String             @db.Uuid
+  created_at           DateTime           @default(now()) @db.Timestamptz(6)
+
+  portfolio_projects portfolio_projects @relation(fields: [portfolio_project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tech               tech               @relation(fields: [tech_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([portfolio_project_id, tech_id])
+  @@index([portfolio_project_id])
   @@index([tech_id])
 }

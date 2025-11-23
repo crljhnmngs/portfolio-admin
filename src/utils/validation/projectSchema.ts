@@ -2,7 +2,7 @@ import z from 'zod';
 
 export const projectSchema = z.object({
     name: z.string().min(1, 'Project name is required'),
-    image: z
+    image_url: z
         .string()
         .url('Invalid image URL')
         .min(1, 'Project image is required'),
