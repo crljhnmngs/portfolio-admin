@@ -10,10 +10,7 @@ export const useUpsertRole = (onSuccessCallback?: () => void) => {
         mutationFn: async (params: UpsertRoleParams) => {
             const response = await axios.put(
                 `/api/roles/${params.generalInfoId}`,
-                params,
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                }
+                params
             );
             return response.data;
         },

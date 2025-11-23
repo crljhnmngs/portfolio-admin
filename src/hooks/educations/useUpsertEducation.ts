@@ -10,10 +10,7 @@ export const useUpsertEducation = (onSuccessCallback?: () => void) => {
         mutationFn: async (params: UpsertEducationParams) => {
             const response = await axios.put(
                 `/api/educations/${params.id || 'add'}`,
-                params,
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                }
+                params
             );
             return response.data;
         },

@@ -10,10 +10,7 @@ export const useUpsertExperience = (onSuccessCallback?: () => void) => {
         mutationFn: async (params: UpsertExperienceParams) => {
             const response = await axios.put(
                 `/api/experiences/${params.id || 'add'}`,
-                params,
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                }
+                params
             );
             return response.data;
         },
@@ -24,7 +21,7 @@ export const useUpsertExperience = (onSuccessCallback?: () => void) => {
             queryClient.invalidateQueries({ queryKey: ['experiences'] });
             onSuccessCallback?.();
         },
-        onError: (_data, params) => {
+        onError: (error, params) => {
             if (axios.isAxiosError(error)) {
                 const errorMessage =
                     error.response?.data?.error ||
@@ -33,7 +30,7 @@ export const useUpsertExperience = (onSuccessCallback?: () => void) => {
                         : 'Failed to add experience');
                 toast.error(errorMessage);
             } else {
-                toast.error('Something went wrong');
+                toast.error('An unexpected error occurred');
             }
         },
     });

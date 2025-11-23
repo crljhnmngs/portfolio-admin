@@ -10,10 +10,7 @@ export const useUpsertSkill = (onSuccessCallback?: () => void) => {
         mutationFn: async (params: UpsertSkillParams) => {
             const response = await axios.put(
                 `/api/skills/${params.id || 'add'}`,
-                params,
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                }
+                params
             );
             return response.data;
         },

@@ -10,10 +10,7 @@ export const useUpsertLocalizedInfo = (onSuccessCallback?: () => void) => {
         mutationFn: async (params: UpsertLocalizedInfoParams) => {
             const response = await axios.put(
                 `/api/localized-info/${params.generalInfoId}`,
-                params,
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                }
+                params
             );
             return response.data;
         },
