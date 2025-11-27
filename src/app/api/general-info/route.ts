@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { GeneralInfoResponse } from '@/types/global';
 import { validateApiKey } from '@/lib/auth-helpers';
+import { handleCorsOptions } from '@/lib/cors-helpers';
 
 export const GET = async (req: Request) => {
     try {
@@ -69,3 +70,5 @@ export const GET = async (req: Request) => {
         );
     }
 };
+
+export const OPTIONS = handleCorsOptions;
