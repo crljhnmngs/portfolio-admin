@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+    # Next.js Application
+    app:
+        build: .
+        container_name: portfolio-admin-app
+        restart: always
+        ports:
+            - '3000:3000'
+        environment:
+            - NODE_ENV=development
+        env_file:
+            - .env.docker
+        volumes:
+            - .:/app
+            - /app/node_modules
+            - /app/.next
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        command: sh -c "npx prisma generate && npm run dev"
