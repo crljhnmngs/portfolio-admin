@@ -14,6 +14,7 @@ export const GET = async (req: Request) => {
                 name: true,
                 icon_url: true,
                 category: true,
+                created_at: true,
             },
             orderBy: {
                 created_at: 'desc',
