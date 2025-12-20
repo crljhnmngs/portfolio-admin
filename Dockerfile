@@ -1,20 +1,20 @@
-FROM node:20-alpine
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json bun.lock ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN bun install --frozen-lockfile
 
 # Copy the rest of the application
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate
+RUN bunx prisma generate
 
 # Expose the port Next.js runs on
 EXPOSE 3000
 
 # Start the development server
-CMD ["npm", "run", "dev"]
+CMD ["bun", "run", "dev"]

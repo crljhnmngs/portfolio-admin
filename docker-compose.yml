@@ -18,4 +18,4 @@ services:
             - /app/.next
         extra_hosts:
             - 'host.docker.internal:host-gateway'
-        command: sh -c "npx prisma generate && npm run dev"
+        command: sh -c "bunx prisma generate && bun run dev"
