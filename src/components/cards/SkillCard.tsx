@@ -14,13 +14,15 @@ type SkillCardProps = {
 export const SkillCard = ({ skill, onEdit, onDelete }: SkillCardProps) => {
     return (
         <div className="flex flex-col items-center gap-3 p-5 border rounded-xl shadow-sm dark:border-gray-700 dark:bg-white/[0.03] hover:shadow-md transition min-w-[200px] max-w-[240px]">
-            <Image
-                src={skill.icon_url}
-                alt={skill.name}
-                width={48}
-                height={48}
-                className="mb-1"
-            />
+            {skill.icon_url?.trim() && (
+                <Image
+                    src={skill.icon_url}
+                    alt={skill.name}
+                    width={48}
+                    height={48}
+                    className="mb-1"
+                />
+            )}
             <div className="text-center">
                 <h3 className="font-medium text-gray-800 dark:text-white text-lg">
                     {skill.name}
