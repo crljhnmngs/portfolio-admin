@@ -93,13 +93,14 @@ export type UpsertSkillParams = {
 };
 
 export type Project = {
-    id: string;
+    id?: string;
     description: string;
+    created_at?: string;
     tech?: string[];
 };
 
 export type SubItem = {
-    id: string;
+    id?: string;
     position: string;
     setup: string;
     start_date: string;

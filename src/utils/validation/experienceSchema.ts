@@ -23,6 +23,7 @@ export const experienceSchema = z.object({
                     z.object({
                         id: z.string().optional(),
                         description: z.string(),
+                        created_at: z.string().optional(),
                         tech: z.array(z.string()).optional(),
                     })
                 ),

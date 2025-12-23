@@ -98,7 +98,13 @@ const Projects = ({
             <Button
                 type="button"
                 size="sm"
-                onClick={() => append({ description: '', tech: [] })}
+                onClick={() =>
+                    append({
+                        description: '',
+                        created_at: new Date().toISOString(),
+                        tech: [],
+                    })
+                }
             >
                 + Add Project
             </Button>

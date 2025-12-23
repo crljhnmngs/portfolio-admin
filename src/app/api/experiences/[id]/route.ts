@@ -1,7 +1,159 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { UpsertExperienceParams } from '@/types/global';
+import { UpsertExperienceParams, SubItem, Project } from '@/types/global';
 import { validateSession } from '@/lib/auth-helpers';
+
+// Helper Functions
+const getOrCreateTechIds = async (techNames: string[]) => {
+    const techIds: string[] = [];
+
+    for (const techName of techNames) {
+        const tech = await prisma.tech.upsert({
+            where: { name: techName.trim() },
+            update: {},
+            create: { name: techName.trim() },
+        });
+        techIds.push(tech.id);
+    }
+
+    return techIds;
+};
+
+const processProjects = async (projects: Project[]) => {
+    if (!projects || projects.length === 0) return [];
+
+    return Promise.all(
+        projects.map(async (project) => {
+            const projectTechIds =
+                project.tech && project.tech.length > 0
+                    ? await getOrCreateTechIds(project.tech)
+                    : [];
+
+            return {
+                description: project.description,
+                created_at: project.created_at,
+                project_tech: {
+                    create: projectTechIds.map((techId) => ({
+                        tech_id: techId,
+                    })),
+                },
+            };
+        })
+    );
+};
+
+const processSubItems = async (subItems: SubItem[] | undefined) => {
+    if (!subItems || subItems.length === 0) return [];
+
+    return Promise.all(
+        subItems.map(async (subItem) => {
+            const projectsData = await processProjects(subItem.projects);
+
+            return {
+                position: subItem.position,
+                setup: subItem.setup,
+                start_date: subItem.start_date,
+                end_date: subItem.end_date,
+                projects: {
+                    create: projectsData,
+                },
+            };
+        })
+    );
+};
+
+const prepareExperienceData = async (body: UpsertExperienceParams) => {
+    const [experienceTechIds, subItemsData] = await Promise.all([
+        body.data.tech && body.data.tech.length > 0
+            ? getOrCreateTechIds(body.data.tech)
+            : [],
+        processSubItems(body.data.sub_items),
+    ]);
+
+    return {
+        // Core experience fields
+        company: body.data.company,
+        role: body.data.role,
+        description: body.data.description,
+        logo: body.data.logo,
+        link: body.data.link,
+        start_date: body.data.start_date,
+        end_date: body.data.end_date,
+        language_code: body.languageCode,
+
+        // Relational data
+        experience_tech: {
+            create: experienceTechIds.map((techId) => ({
+                tech_id: techId,
+            })),
+        },
+        sub_items: {
+            create: subItemsData,
+        },
+    };
+};
+
+// Query configuration for including all nested relations
+const includeRelations = {
+    experience_tech: {
+        include: { tech: true },
+    },
+    sub_items: {
+        include: {
+            projects: {
+                include: {
+                    project_tech: {
+                        include: { tech: true },
+                    },
+                },
+            },
+        },
+    },
+};
+
+// Validation
+const validateRequest = (body: UpsertExperienceParams) => {
+    if (!body.data.company?.trim()) {
+        return NextResponse.json(
+            { error: 'Company name is required' },
+            { status: 400 }
+        );
+    }
+
+    if (!body.languageCode?.trim()) {
+        return NextResponse.json(
+            { error: 'Language code is required' },
+            { status: 400 }
+        );
+    }
+
+    return null;
+};
+
+// Error handling
+const handleError = (error: unknown) => {
+    console.error('Error upserting experience:', error);
+
+    if (error instanceof Error) {
+        if (error.message.includes('Foreign key constraint')) {
+            return NextResponse.json(
+                { error: 'Invalid language code' },
+                { status: 400 }
+            );
+        }
+        if (error.message.includes('P2002')) {
+            return NextResponse.json(
+                { error: 'Duplicate entry detected' },
+                { status: 400 }
+            );
+        }
+    }
+
+    return NextResponse.json(
+        { error: 'Failed to upsert experience' },
+        { status: 500 }
+    );
+};
 
 export const PUT = async (
     req: Request,
@@ -14,143 +166,23 @@ export const PUT = async (
         const { id: experienceId } = await context.params;
         const body: UpsertExperienceParams = await req.json();
 
-        if (!body.data.company?.trim()) {
-            return NextResponse.json(
-                { error: 'Company name is required' },
-                { status: 400 }
-            );
-        }
+        // Validate request
+        const validationError = validateRequest(body);
+        if (validationError) return validationError;
 
-        if (!body.languageCode?.trim()) {
-            return NextResponse.json(
-                { error: 'Language code is required' },
-                { status: 400 }
-            );
-        }
+        // Prepare data structure
+        const experienceData = await prepareExperienceData(body);
 
-        // Helper function to get or create tech IDs
-        const getOrCreateTechIds = async (techNames: string[]) => {
-            const techIds: string[] = [];
-
-            for (const techName of techNames) {
-                const tech = await prisma.tech.upsert({
-                    where: { name: techName.trim() },
-                    update: {},
-                    create: { name: techName.trim() },
-                });
-                techIds.push(tech.id);
-            }
-
-            return techIds;
-        };
-
-        // TODO: Add comments for what this part is doing.
+        let experience;
 
         if (experienceId === 'add') {
-            // CREATE NEW EXPERIENCE
-
-            // Get or create all tech items first
-            const experienceTechIds =
-                body.data.tech && body.data.tech.length > 0
-                    ? await getOrCreateTechIds(body.data.tech)
-                    : [];
-
-            // Process sub_items and their projects
-            const subItemsData =
-                body.data.sub_items && body.data.sub_items.length > 0
-                    ? await Promise.all(
-                          body.data.sub_items.map(async (subItem) => {
-                              const projectsData =
-                                  subItem.projects &&
-                                  subItem.projects.length > 0
-                                      ? await Promise.all(
-                                            subItem.projects.map(
-                                                async (project) => {
-                                                    const projectTechIds =
-                                                        project.tech &&
-                                                        project.tech.length > 0
-                                                            ? await getOrCreateTechIds(
-                                                                  project.tech
-                                                              )
-                                                            : [];
-
-                                                    return {
-                                                        description:
-                                                            project.description,
-                                                        project_tech: {
-                                                            create: projectTechIds.map(
-                                                                (techId) => ({
-                                                                    tech_id:
-                                                                        techId,
-                                                                })
-                                                            ),
-                                                        },
-                                                    };
-                                                }
-                                            )
-                                        )
-                                      : [];
-
-                              return {
-                                  position: subItem.position,
-                                  setup: subItem.setup,
-                                  start_date: subItem.start_date,
-                                  end_date: subItem.end_date,
-                                  projects: {
-                                      create: projectsData,
-                                  },
-                              };
-                          })
-                      )
-                    : [];
-
-            // Create the experience
-            const experience = await prisma.experiences.create({
-                data: {
-                    company: body.data.company,
-                    role: body.data.role,
-                    description: body.data.description,
-                    logo: body.data.logo,
-                    link: body.data.link,
-                    start_date: body.data.start_date,
-                    end_date: body.data.end_date,
-                    language_code: body.languageCode,
-
-                    // Create tech relations
-                    experience_tech: {
-                        create: experienceTechIds.map((techId) => ({
-                            tech_id: techId,
-                        })),
-                    },
-
-                    // Create sub_items
-                    sub_items: {
-                        create: subItemsData,
-                    },
-                },
-                include: {
-                    experience_tech: {
-                        include: { tech: true },
-                    },
-                    sub_items: {
-                        include: {
-                            projects: {
-                                include: {
-                                    project_tech: {
-                                        include: { tech: true },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
+            // CREATE
+            experience = await prisma.experiences.create({
+                data: experienceData,
+                include: includeRelations,
             });
-
-            return NextResponse.json({ success: true, data: experience });
         } else {
-            // UPDATE EXISTING EXPERIENCE
-
-            // Delete existing relations
+            // UPDATE
             await prisma.$transaction([
                 prisma.experience_tech.deleteMany({
                     where: { experience_id: experienceId },
@@ -160,128 +192,16 @@ export const PUT = async (
                 }),
             ]);
 
-            // Get or create all tech items first
-            const experienceTechIds =
-                body.data.tech && body.data.tech.length > 0
-                    ? await getOrCreateTechIds(body.data.tech)
-                    : [];
-
-            // Process sub_items and their projects
-            const subItemsData =
-                body.data.sub_items && body.data.sub_items.length > 0
-                    ? await Promise.all(
-                          body.data.sub_items.map(async (subItem) => {
-                              const projectsData =
-                                  subItem.projects &&
-                                  subItem.projects.length > 0
-                                      ? await Promise.all(
-                                            subItem.projects.map(
-                                                async (project) => {
-                                                    const projectTechIds =
-                                                        project.tech &&
-                                                        project.tech.length > 0
-                                                            ? await getOrCreateTechIds(
-                                                                  project.tech
-                                                              )
-                                                            : [];
-
-                                                    return {
-                                                        description:
-                                                            project.description,
-                                                        project_tech: {
-                                                            create: projectTechIds.map(
-                                                                (techId) => ({
-                                                                    tech_id:
-                                                                        techId,
-                                                                })
-                                                            ),
-                                                        },
-                                                    };
-                                                }
-                                            )
-                                        )
-                                      : [];
-
-                              return {
-                                  position: subItem.position,
-                                  setup: subItem.setup,
-                                  start_date: subItem.start_date,
-                                  end_date: subItem.end_date,
-                                  projects: {
-                                      create: projectsData,
-                                  },
-                              };
-                          })
-                      )
-                    : [];
-
-            // Update the experience
-            const experience = await prisma.experiences.update({
+            experience = await prisma.experiences.update({
                 where: { id: experienceId },
-                data: {
-                    company: body.data.company,
-                    role: body.data.role,
-                    description: body.data.description,
-                    logo: body.data.logo,
-                    link: body.data.link,
-                    start_date: body.data.start_date,
-                    end_date: body.data.end_date,
-                    language_code: body.languageCode,
-
-                    // Create tech relations
-                    experience_tech: {
-                        create: experienceTechIds.map((techId) => ({
-                            tech_id: techId,
-                        })),
-                    },
-
-                    // Create sub_items
-                    sub_items: {
-                        create: subItemsData,
-                    },
-                },
-                include: {
-                    experience_tech: {
-                        include: { tech: true },
-                    },
-                    sub_items: {
-                        include: {
-                            projects: {
-                                include: {
-                                    project_tech: {
-                                        include: { tech: true },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
+                data: experienceData,
+                include: includeRelations,
             });
-
-            return NextResponse.json({ success: true, data: experience });
         }
+
+        return NextResponse.json({ success: true, data: experience });
     } catch (error) {
-        console.error('Error upserting experience:', error);
-
-        if (error instanceof Error) {
-            if (error.message.includes('Foreign key constraint')) {
-                return NextResponse.json(
-                    { error: 'Invalid language code' },
-                    { status: 400 }
-                );
-            }
-            if (error.message.includes('P2002')) {
-                return NextResponse.json(
-                    { error: 'Duplicate entry detected' },
-                    { status: 400 }
-                );
-            }
-        }
-
-        return NextResponse.json(
-            { error: 'Failed to upsert experience' },
-            { status: 500 }
-        );
+        return handleError(error);
     }
 };
 

@@ -60,6 +60,7 @@ export const GET = async (req: Request) => {
                             select: {
                                 id: true,
                                 description: true,
+                                created_at: true,
 
                                 // Include project tech
                                 project_tech: {
@@ -74,12 +75,12 @@ export const GET = async (req: Request) => {
                                 },
                             },
                             orderBy: {
-                                created_at: 'asc',
+                                created_at: 'desc',
                             },
                         },
                     },
                     orderBy: {
-                        created_at: 'asc',
+                        start_date: 'desc',
                     },
                 },
             },
