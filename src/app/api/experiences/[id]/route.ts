@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { UpsertExperienceParams, SubItem, Project } from '@/types/global';
 import { validateSession } from '@/lib/auth-helpers';
+import { checkRateLimit, createRateLimitResponse } from '@/lib/rate-limiter';
 
 // Helper Functions
 const getOrCreateTechIds = async (techNames: string[]) => {
@@ -163,6 +164,23 @@ export const PUT = async (
         const auth = await validateSession();
         if (!auth.valid) return auth.response;
 
+        if (!auth.user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const rateLimitResult = checkRateLimit(auth.user.id, {
+            windowMs: 5 * 60 * 1000,
+            maxAttempts: 20,
+            prefix: 'experience-upsert',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
+
         const { id: experienceId } = await context.params;
         const body: UpsertExperienceParams = await req.json();
 
@@ -212,6 +230,23 @@ export const DELETE = async (
     try {
         const auth = await validateSession();
         if (!auth.valid) return auth.response;
+
+        if (!auth.user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const rateLimitResult = checkRateLimit(auth.user.id, {
+            windowMs: 5 * 60 * 1000,
+            maxAttempts: 10,
+            prefix: 'experience-delete',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
 
         const { id: experienceId } = await params;
 

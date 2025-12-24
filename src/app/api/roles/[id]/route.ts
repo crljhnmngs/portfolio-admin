@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { UpsertRoleParams } from '@/types/global';
 import { validateSession } from '@/lib/auth-helpers';
+import { checkRateLimit, createRateLimitResponse } from '@/lib/rate-limiter';
 
 export const PUT = async (
     req: Request,
@@ -10,6 +11,23 @@ export const PUT = async (
     try {
         const auth = await validateSession();
         if (!auth.valid) return auth.response;
+
+        if (!auth.user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const rateLimitResult = checkRateLimit(auth.user.id, {
+            windowMs: 5 * 60 * 1000,
+            maxAttempts: 20,
+            prefix: 'role-upsert',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
 
         const { id: generalInfoId } = await context.params;
         const body: UpsertRoleParams = await req.json();
@@ -55,6 +73,23 @@ export const DELETE = async (
     try {
         const auth = await validateSession();
         if (!auth.valid) return auth.response;
+
+        if (!auth.user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        const rateLimitResult = checkRateLimit(auth.user.id, {
+            windowMs: 5 * 60 * 1000,
+            maxAttempts: 10,
+            prefix: 'role-delete',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
 
         const { id: roleId } = await params;
 

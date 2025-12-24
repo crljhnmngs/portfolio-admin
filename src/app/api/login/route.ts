@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { lucia } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limiter';
 
 export const POST = async (req: NextRequest) => {
     try {
@@ -11,6 +12,38 @@ export const POST = async (req: NextRequest) => {
             return NextResponse.json(
                 { error: 'Missing fields' },
                 { status: 400 }
+            );
+        }
+
+        const { success, limit, remaining, resetTime } = checkRateLimit(
+            email.toLowerCase(),
+            {
+                windowMs: 15 * 60 * 1000, // 15 minutes
+                maxAttempts: 5,
+                prefix: 'login',
+            }
+        );
+
+        if (!success) {
+            const minutesUntilReset = Math.ceil(
+                (resetTime - Date.now()) / 60000
+            );
+
+            return NextResponse.json(
+                {
+                    error: `Too many login attempts. Please try again in ${minutesUntilReset} minute${
+                        minutesUntilReset !== 1 ? 's' : ''
+                    }.`,
+                    retryAfter: new Date(resetTime).toISOString(),
+                },
+                {
+                    status: 429,
+                    headers: {
+                        'X-RateLimit-Limit': limit.toString(),
+                        'X-RateLimit-Remaining': remaining.toString(),
+                        'X-RateLimit-Reset': new Date(resetTime).toISOString(),
+                    },
+                }
             );
         }
 

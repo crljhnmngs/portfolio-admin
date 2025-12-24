@@ -2,11 +2,27 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { handleCorsOptions } from '@/lib/cors-helpers';
 import { validateApiKey } from '@/lib/auth-helpers';
+import {
+    checkRateLimit,
+    createRateLimitResponse,
+    getClientIp,
+} from '@/lib/rate-limiter';
 
 export const GET = async (req: Request) => {
     try {
         const auth = validateApiKey(req);
         if (!auth.valid) return auth.response;
+
+        const ip = getClientIp(req);
+        const rateLimitResult = checkRateLimit(ip, {
+            windowMs: 1 * 60 * 1000,
+            maxAttempts: 60,
+            prefix: 'educations-get',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
 
         const { searchParams } = new URL(req.url);
         const languageCode = searchParams.get('languageCode') || '';

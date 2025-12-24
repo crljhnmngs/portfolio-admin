@@ -200,3 +200,21 @@ export type UpsertProjectParams = {
 export type ProjectsApiResponse = {
     projects: Projects[];
 };
+
+export type RateLimitEntry = {
+    count: number;
+    resetTime: number;
+};
+
+export type RateLimitConfig = {
+    windowMs?: number;
+    maxAttempts?: number;
+    prefix?: string;
+};
+
+export type RateLimitResult = {
+    success: boolean;
+    limit: number;
+    remaining: number;
+    resetTime: number;
+};

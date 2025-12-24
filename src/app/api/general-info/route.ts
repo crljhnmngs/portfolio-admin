@@ -3,11 +3,27 @@ import prisma from '@/lib/prisma';
 import { GeneralInfoResponse } from '@/types/global';
 import { validateApiKey } from '@/lib/auth-helpers';
 import { handleCorsOptions } from '@/lib/cors-helpers';
+import {
+    checkRateLimit,
+    createRateLimitResponse,
+    getClientIp,
+} from '@/lib/rate-limiter';
 
 export const GET = async (req: Request) => {
     try {
         const auth = validateApiKey(req);
         if (!auth.valid) return auth.response;
+
+        const ip = getClientIp(req);
+        const rateLimitResult = checkRateLimit(ip, {
+            windowMs: 1 * 60 * 1000,
+            maxAttempts: 60,
+            prefix: 'general-info-get',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
 
         const data = await prisma.general_info.findFirst({
             select: {

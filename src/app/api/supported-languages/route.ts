@@ -2,11 +2,27 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { validateApiKey } from '@/lib/auth-helpers';
 import { handleCorsOptions } from '@/lib/cors-helpers';
+import {
+    checkRateLimit,
+    createRateLimitResponse,
+    getClientIp,
+} from '@/lib/rate-limiter';
 
 export const GET = async (req: Request) => {
     try {
         const auth = validateApiKey(req);
         if (!auth.valid) return auth.response;
+
+        const ip = getClientIp(req);
+        const rateLimitResult = checkRateLimit(ip, {
+            windowMs: 1 * 60 * 1000,
+            maxAttempts: 120,
+            prefix: 'skills-get',
+        });
+
+        if (!rateLimitResult.success) {
+            return createRateLimitResponse(rateLimitResult);
+        }
 
         const languages = await prisma.supported_languages.findMany({
             select: {
