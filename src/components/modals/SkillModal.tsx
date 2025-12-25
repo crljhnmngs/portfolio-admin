@@ -62,7 +62,7 @@ export const SkillModal = ({
         await upsertSkill({
             id: initialData?.id ?? '',
             name: data.name,
-            icon_url: data.icon_url,
+            icon_url: data.icon_url || '',
             category: data.category,
         });
     };
