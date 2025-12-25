@@ -218,3 +218,13 @@ export type RateLimitResult = {
     remaining: number;
     resetTime: number;
 };
+
+export type Images = {
+    id: string;
+    url: string;
+    publicId: string;
+};
+
+export type ImagesApiResponse = {
+    images: Images[];
+};

@@ -11,7 +11,7 @@ import {
     UserCircleIcon,
     Experience,
 } from '../icons/index';
-import { GraduationCap, FolderKanban } from 'lucide-react';
+import { GraduationCap, FolderKanban, Images } from 'lucide-react';
 
 type NavItem = {
     name: string;
@@ -50,6 +50,11 @@ const navItems: NavItem[] = [
         icon: <FolderKanban className="w-6 h-7" strokeWidth={0.75} />,
         name: 'Projects',
         path: '/projects',
+    },
+    {
+        icon: <Images className="w-6 h-7" strokeWidth={0.75} />,
+        name: 'Images',
+        path: '/images',
     },
 ];
 

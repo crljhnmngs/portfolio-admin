@@ -239,3 +239,12 @@ model portfolio_project_tech {
   @@index([portfolio_project_id])
   @@index([tech_id])
 }
+
+model image {
+  id        String   @id @default(cuid())
+  url       String
+  publicId  String 
+  created_at DateTime @default(now())
+  
+  @@index([created_at])
+}
