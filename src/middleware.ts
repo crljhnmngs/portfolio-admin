@@ -8,6 +8,7 @@ const protectedRoutes = [
     '/experience',
     '/education',
     '/projects',
+    '/images',
 ];
 const authRoutes = ['/'];
 
@@ -38,5 +39,6 @@ export const config = {
         '/experience',
         '/education',
         '/projects',
+        '/images',
     ],
 };
