@@ -6,7 +6,7 @@ import { deleteFromCloudinary } from '@/lib/cloudinary';
 
 export const DELETE = async (
     _req: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) => {
     try {
         const auth = await validateSession();
@@ -29,7 +29,7 @@ export const DELETE = async (
             return createRateLimitResponse(rateLimitResult);
         }
 
-        const { id: imageId } = await params;
+        const { id: imageId } = await context.params;
 
         if (!imageId) {
             return NextResponse.json(

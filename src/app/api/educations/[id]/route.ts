@@ -143,7 +143,7 @@ export const PUT = async (
 
 export const DELETE = async (
     _req: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) => {
     try {
         const auth = await validateSession();
@@ -166,7 +166,7 @@ export const DELETE = async (
             return createRateLimitResponse(rateLimitResult);
         }
 
-        const { id: educationId } = await params;
+        const { id: educationId } = await context.params;
 
         if (!educationId) {
             return NextResponse.json(

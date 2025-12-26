@@ -6,7 +6,7 @@ import { checkRateLimit, createRateLimitResponse } from '@/lib/rate-limiter';
 
 export const PUT = async (
     req: Request,
-    { params }: { params: { id?: string } }
+    context: { params: Promise<{ id: string }> }
 ) => {
     try {
         const auth = await validateSession();
@@ -29,7 +29,7 @@ export const PUT = async (
             return createRateLimitResponse(rateLimitResult);
         }
 
-        const { id: skillId } = await params;
+        const { id: skillId } = await context.params;
         const body: UpsertSkillParams = await req.json();
 
         if (!body.name?.trim()) {
@@ -70,7 +70,7 @@ export const PUT = async (
 
 export const DELETE = async (
     _req: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) => {
     try {
         const auth = await validateSession();
@@ -93,7 +93,7 @@ export const DELETE = async (
             return createRateLimitResponse(rateLimitResult);
         }
 
-        const { id: skillId } = await params;
+        const { id: skillId } = await context.params;
 
         if (!skillId) {
             return NextResponse.json(

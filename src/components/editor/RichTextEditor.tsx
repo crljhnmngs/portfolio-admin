@@ -84,7 +84,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(
                 const newEditorState = EditorState.createWithContent(content);
                 setEditorState(EditorState.moveFocusToEnd(newEditorState));
             }
-        }, [value]);
+        }, [value, editorState]);
 
         useImperativeHandle(ref, () => ({
             focus: () => editorRef.current?.focus(),
